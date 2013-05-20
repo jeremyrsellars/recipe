@@ -25,8 +25,8 @@ namespace Sellars.Meal.UI
       {
          var window = new Sellars.Meal.UI.View.MainWindow ();
 
-         //ServiceController.Put<IRecipeService> (new FileSystemRecipeService ());
-         ServiceController.Put<IRecipeService> (IndexRecipeService.CreateIndex ());
+         ServiceController.Put<IRecipeService> (new FileSystemRecipeService ());
+         //ServiceController.Put<IRecipeService> (IndexRecipeService.CreateIndex ());
 
          object dataContext;
          
@@ -34,7 +34,7 @@ namespace Sellars.Meal.UI
          
          //IRecipe irecipe;
          IRecipeService recipeService = ServiceController.Get<IRecipeService> ();
-         SelectedIndexViewModel vm;// = new SelectedIndexViewModel ();
+         SelectedIndexViewModel vm= new SelectedIndexViewModel ();
          //if (args.Length >= 2)
          //{
          //   irecipe = recipeService.GetRecipe (new ModelId<IRecipe> (args [1]));
