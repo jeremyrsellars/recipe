@@ -19,6 +19,8 @@ namespace Sellars.Meal.UI.Model
          {
             Name=recipe.Name,
             Servings=recipe.Servings,
+            Yield=recipe.Yield,
+            YieldUnit=Unit.FromUnit(recipe.YieldUnit),
             Parts=new List<RecipePart> (recipe.Parts.Select<IRecipePart,RecipePart>(RecipePart.FromRecipePart)),
             Source=Source.FromSource (recipe.Source),
             CreatedOn=recipe.CreatedOn,
@@ -35,6 +37,8 @@ namespace Sellars.Meal.UI.Model
       
       public ModelId<IRecipe> Id{get;set;}
       public Fraction Servings{get;set;}
+      public Fraction Yield{get;set;}
+      public Unit YieldUnit{get;set;}
       public Source Source{get;set;}
       public DateTime CreatedOn{get;set;}
       public string CreatedBy{get;set;}
@@ -91,6 +95,14 @@ namespace Sellars.Meal.UI.Model
          set
          {
             m_tags = value;
+         }
+      }
+
+      IUnit IRecipe.YieldUnit
+      {
+         get
+         {
+            return YieldUnit;
          }
       }
 

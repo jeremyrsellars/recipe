@@ -21,12 +21,13 @@ namespace Sellars.Meal.UI.View
    {
       public static readonly DependencyProperty RatingProperty = DependencyProperty.Register ("Rating", typeof(double), typeof (RatingBox), new PropertyMetadata ((double)2.5, RatingChanged), ValidateRatingValue);
       public static readonly DependencyProperty MaxRatingProperty = DependencyProperty.Register ("MaxRating", typeof(int), typeof (RatingBox), new PropertyMetadata (5, MaxRatingChanged), ValidateMaxRatingValue);
-      public static readonly DependencyProperty GlyphProperty = DependencyProperty.Register ("Glyph", typeof(char), typeof (RatingBox), new PropertyMetadata ('n', GlyphChanged), ValidateGlyphValue);
+      public static readonly DependencyProperty GlyphProperty = DependencyProperty.Register ("Glyph", typeof(char), typeof (RatingBox), new PropertyMetadata ((char)0x98, GlyphChanged), ValidateGlyphValue);
 
       public RatingBox()
       {
-         m_glyph = 'n';
+         m_glyph = (char)0x98;
          m_maxRating = 5;
+         m_rating = 2.5;
          InitializeComponent();
 
          Reset (true);
@@ -46,6 +47,7 @@ namespace Sellars.Meal.UI.View
                return;
             m_rating = value;
             Reset (false);
+            SetValue (RatingProperty, m_rating);
          }
       }
 
@@ -152,7 +154,7 @@ namespace Sellars.Meal.UI.View
          double x = position.X;
          double maxX = txtMaxRating.ActualWidth;
          
-         m_rating = GetRatingAt (x, maxX);
+         Rating = GetRatingAt (x, maxX);
          m_hoverRating = null;
          Reset (false);
       }
@@ -185,7 +187,7 @@ namespace Sellars.Meal.UI.View
          double x = position.X;
          double maxX = txtMaxRating.ActualWidth;
          
-         m_rating = GetRatingAt (x, maxX);
+         Rating = GetRatingAt (x, maxX);
          m_hoverRating = null;
          Reset (false);
       }

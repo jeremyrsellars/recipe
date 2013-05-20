@@ -9,6 +9,7 @@ recipePart
 	preparationMethod		- Oven, slow cooker, skillet, freezer, etc.
 	preparationTime
 	cookTime
+	chillTime
 	component []
 	instructions
 	comments

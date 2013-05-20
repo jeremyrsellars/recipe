@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,7 @@ namespace Sellars.Meal.UI.ViewModel
       public RecipeViewModel ()
       {
          SaveCommand = new RelayCommand (Save_Execute);
+         EditMode = true;
       }
 
       public string FileName{get;set;}
@@ -74,7 +76,7 @@ namespace Sellars.Meal.UI.ViewModel
                               Visible = false,
                               Model = new RecipePart
                                  {
-                                    PreparationMethod = new Tag {Name="Add Part"},
+                                    PreparationMethod = new Tag {Name=""},
                                  },
                            };
                   };
@@ -82,7 +84,7 @@ namespace Sellars.Meal.UI.ViewModel
                double rating;
                rating = 
                   (value.Ratings == null || value.Ratings.Count == 0) ?
-                     2.5 :
+                     0 :
                      (value.Ratings.Aggregate (
                         0.0,
                         (seed, r) => seed + r.Value) / value.Ratings.Count);
@@ -91,6 +93,47 @@ namespace Sellars.Meal.UI.ViewModel
             }
             OnPropertyChanged ("Recipe");
             OnPropertyChanged ("Document");
+         }
+      }
+
+      public string SourceName
+      {
+         get
+         {
+            return Source.Source.Name;
+         }
+         set
+         {
+            var sourceVm = new SourceViewModel (new Source {Name = value}, true);
+            Source = sourceVm;
+            UpdateSources (sourceVm);
+         }
+      }
+
+      public SourceViewModel Source
+      {
+         get
+         {
+            if (Recipe.Source == null)
+               m_sourceVM = new SourceViewModel (Recipe.Source = new Source (), false);
+            if (m_sourceVM == null)
+            {
+               m_sourceVM = 
+                  Sources.FirstOrDefault (s => StringComparer.CurrentCultureIgnoreCase.Equals (s.Name, Recipe.Source.Name));
+               if (m_sourceVM == null)
+                  m_sourceVM = new SourceViewModel (Recipe.Source, true);
+            }
+            return m_sourceVM;
+         }
+         set
+         {
+            if (SetValue(ref m_sourceVM, value, "Source"))
+            {
+               if (value == null || value.Source == null)
+                  Recipe.Source = null;
+               else
+                  Recipe.Source = value.Source as Source ?? new Source {Name = value.Name};
+            }
          }
       }
 
@@ -115,15 +158,54 @@ namespace Sellars.Meal.UI.ViewModel
          }
       }
       
-      public IEnumerable<Model.Source>
+      public IEnumerable<SourceViewModel>
       Sources
       {
          get
          {
-            foreach (Model.Source source in new Service.MockSourceDataProvider().SearchSource ())
+            return m_sources ?? (m_sources = new ObservableCollection<SourceViewModel> (GetSourcesCore ()));
+         }
+      }
+      
+      private SourceViewModel m_sourceUpdated;
+      private void UpdateSources (SourceViewModel sourceUpdated)
+      {
+         int index = m_sources.IndexOf (m_sourceUpdated);
+         if (index >= 0)
+         {
+            if (sourceUpdated == null)
+               m_sources.RemoveAt (index);
+            else
+               m_sources[index] = sourceUpdated;
+         }
+         else
+         {
+            for (int i = 0; i < m_sources.Count; i++)
             {
-               yield return source;
+               string name = m_sources[i].Name;
+               if (name == sourceUpdated.Name)
+                  sourceUpdated = null;
+               else if (name.CompareTo (sourceUpdated.Name) > 0)
+                  m_sources.Insert (i, sourceUpdated);
+               else
+                  continue;
+               break;
             }
+         }
+         m_sourceUpdated = sourceUpdated;
+      }
+
+      private IEnumerable<SourceViewModel>
+      GetSourcesCore ()
+      {
+         var newSource = new Source ();
+         //yield return new SourceViewModel (newSource, false);
+         var sources = 
+            ServiceController.Get<Sellars.Meal.UI.Service.ISourceService> ().GetSources ()
+               .OrderBy (s => s.Name);
+         foreach (Model.Source source in sources)
+         {
+            yield return new SourceViewModel (source, true);
          }
       }
 
@@ -178,6 +260,7 @@ namespace Sellars.Meal.UI.ViewModel
       CreateDocument (IRecipe recipe)
       {
          Doc.FlowDocument doc = new Doc.FlowDocument ();
+         doc.ColumnWidth = 640;
          doc.Typography.Fraction = System.Windows.FontFraction.Slashed;
          doc.FontFamily = new System.Windows.Media.FontFamily ("Palatino Linotype");
          
@@ -193,7 +276,23 @@ namespace Sellars.Meal.UI.ViewModel
             recipeHeader.Blocks.Add (p = new Doc.Paragraph (new Doc.Italic (new Doc.Run("From "))));
             p.Inlines.Add (new Doc.Run(recipe.Source.Name));
          }
-         recipeHeader.Blocks.Add (new Doc.Paragraph (new Doc.Run("Serves " + recipe.Servings)));
+
+         if (recipe.Servings.ToDouble () > 0 || recipe.Servings.ToDouble () > 0)
+         {
+            string yieldAndOrServings = null;
+            if (recipe.Servings.ToDouble () > 0)
+            {
+               yieldAndOrServings = "Serves " + recipe.Servings;
+            }
+            if (recipe.Yield.ToDouble () > 0)
+            {
+               string yieldUnit = recipe.YieldUnit == null ? null : recipe.YieldUnit.Name;
+               if (yieldAndOrServings != null)
+                  yieldAndOrServings = yieldAndOrServings + " \u2022 " + "Yields " + recipe.Yield + " " + yieldUnit;
+            }
+            recipeHeader.Blocks.Add (new Doc.Paragraph (new Doc.Run(yieldAndOrServings)));
+         }
+
          string tags =
             recipe.Tags
             .Aggregate(
@@ -213,31 +312,41 @@ namespace Sellars.Meal.UI.ViewModel
             Doc.Section partHeader = new Doc.Section ();
             doc.Blocks.Add (partHeader);
 
-            partHeader.Blocks.Add (new Doc.Paragraph (new Doc.Underline (new Doc.Run(part.Name))));
-            string prepTime = cookTimeConverter.Convert (part.PreparationTime, typeof (string), null, null) as string;
-            string cookTime = cookTimeConverter.Convert (part.CookTime, typeof (string), null, null) as string;
+            if (!string.IsNullOrWhiteSpace (part.Name) && part.Name != recipe.Name)
+               partHeader.Blocks.Add (new Doc.Paragraph (new Doc.Underline (new Doc.Run(part.Name))));
             string prepMethod = part.PreparationMethod != null ? part.PreparationMethod.Name : null;
 
-            prepTime = "Preparation: " + prepTime;
-            cookTime = "Cook: " + cookTime;
-            Doc.Paragraph stats = new Doc.Paragraph ();
-            partHeader.Blocks.Add (stats);
-            stats.Inlines.Add (new Doc.Run(prepTime + " \u2022 "));
-            stats.Inlines.Add (new Doc.Run(prepMethod + " \u2022 "));
-            stats.Inlines.Add (new Doc.Run(cookTime + " \u2022 "));
-            stats.Inlines.Add (new Doc.Run(part.Temperature + " \u00BA F"));
-            
+            SmartListFormatter times = new SmartListFormatter (" \u2022 ", ": ");
+            if (part.PreparationTime != TimeSpan.Zero)
+               times.Append ("Prep Time", cookTimeConverter.Convert (part.PreparationTime, typeof (string), null, null) as string);
+            if (prepMethod != null)
+               times.Append (prepMethod);
+            if (part.CookTime != TimeSpan.Zero)
+               times.Append ("Cook", cookTimeConverter.Convert (part.CookTime, typeof (string), null, null) as string);
+            if (part.Temperature != 0)
+               times.Append (part.Temperature + " \u00BA F");
+            if (part.ChillTime != TimeSpan.Zero)
+               times.Append ("Chill", cookTimeConverter.Convert (part.ChillTime, typeof (string), null, null) as string);
+
+            if (times.GetStringBuilder ().Length > 0)
+            {
+               Doc.Paragraph stats = new Doc.Paragraph ();
+               partHeader.Blocks.Add (stats);
+               stats.Inlines.Add (new Doc.Run(times.ToString ()));
+            }
+
             string ingredients = 
                part.Ingredients == null ? "" :
                "Ingredients:\r\n" + 
                      part.Ingredients.Aggregate(
                         new StringBuilder (),
                         (sb,ing) => sb.AppendLine (IngredientToString (ing)),
-                        sb => sb.ToString ());
+                        sb => sb.ToString (0, sb.Length == 0 ? 0 : sb.Length - Environment.NewLine.Length));
             Doc.Paragraph partIngredients = new Doc.Paragraph (new Doc.Run(ingredients));
             partHeader.Blocks.Add (partIngredients);
 
-            partHeader.Blocks.Add (new Doc.Paragraph (new Doc.Run("Instructions:\r\n" + part.Instructions)));
+            if (!string.IsNullOrWhiteSpace (part.Instructions))
+               partHeader.Blocks.Add (new Doc.Paragraph (new Doc.Run("Instructions:\r\n" + part.Instructions)));
 
             string comments = (part.Comments == null || part.Comments.Count == 0) ? "" :
                part.Comments
@@ -249,7 +358,8 @@ namespace Sellars.Meal.UI.ViewModel
                      return sb;
                   },
                   sb => sb.ToString (0, sb.Length - Environment.NewLine.Length));
-            partHeader.Blocks.Add (new Doc.Paragraph (new Doc.Run(comments)));
+            if (!string.IsNullOrWhiteSpace (comments))
+               partHeader.Blocks.Add (new Doc.Paragraph (new Doc.Run(comments)));
          }
 
          return doc;
@@ -264,6 +374,9 @@ namespace Sellars.Meal.UI.ViewModel
                s.Append (' ');
             s.Append (ing.Quantity);
          }
+
+         if (ing.Quantity != Fraction.Zero && ing.Amount != Fraction.Zero)
+            s.Append (" - ");
 
          if (ing.Amount != Fraction.Zero)
          {
@@ -300,7 +413,58 @@ namespace Sellars.Meal.UI.ViewModel
       private AutoAddCollection<RecipePartViewModel> m_recipeParts;
       private Sellars.Meal.UI.Model.Recipe  m_recipe;
       private RatingViewModel m_userRating;
+      private SourceViewModel m_sourceVM;
       private bool m_editMode;
+      private static ObservableCollection<SourceViewModel> m_sources;
+
+      public class SmartListFormatter
+      {
+         public SmartListFormatter (string delimiter, string pairDelimiter)
+         {
+            if (delimiter == null)
+               throw new ArgumentNullException ("delimiter");
+            if (pairDelimiter == null)
+               throw new ArgumentNullException ("pairDelimiter");
+
+            m_delimiter = delimiter;
+            m_pairDelimiter = pairDelimiter;
+            m_buf = new StringBuilder ();
+         }
+
+         public override string ToString ()
+         {
+            return m_buf.ToString ();
+         }
+
+         public StringBuilder GetStringBuilder ()
+         {
+            return m_buf;
+         }
+
+         public void Append (string value)
+         {
+            AppendDelimiterIfNecessary ();
+            m_buf.Append (value);
+         }
+
+         public void Append (string caption, string value)
+         {
+            AppendDelimiterIfNecessary ();
+            m_buf.Append (caption);
+            m_buf.Append (m_pairDelimiter);
+            m_buf.Append (value);
+         }
+
+         private void AppendDelimiterIfNecessary ()
+         {
+            if (m_buf.Length != 0)
+               m_buf.Append (m_delimiter);
+         }
+
+         private StringBuilder m_buf;
+         private string m_delimiter;
+         private string m_pairDelimiter;
+      }
 
       public class RatingViewModel : NotifyPropertyChangedObject
       {

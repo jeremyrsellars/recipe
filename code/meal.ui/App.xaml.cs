@@ -4,6 +4,7 @@ using System.Configuration;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using Sellars.Meal.Svc.Model;
 using Sellars.Service;
@@ -44,26 +45,20 @@ namespace Sellars.Meal.UI
          //}
          //else
          {
+            var recipe = new Sellars.Meal.UI.Model.Recipe ();
+            recipe.Source = new Sellars.Meal.UI.Model.Source ();
+            recipe.Parts.Add (new Sellars.Meal.UI.Model.RecipePart (){Name="Recipe"});
             vm = new SelectedIndexViewModel {Index = GetIndex ()};
-            var newRecipe = 
-                     new RecipeViewModel
-                     {
-                        Recipe=new Sellars.Meal.UI.Model.Recipe
-                        {
-                           Source=new Sellars.Meal.UI.Model.Source (),
-                        }
-                     };
+            var newRecipe = new RecipeViewModel{Recipe=recipe};
             var newHeader =
                new RecipeHeaderViewModel
                {
                   Key = "New", 
-                  Recipes = new List<RecipeViewModel>
-                  {
-                     newRecipe
-                  }
+                  Recipes = new List<RecipeViewModel>{newRecipe}
                };
-            vm.Index.Add (newHeader);
+            vm.Index.Insert (0, newHeader);
             vm.Recipe = newRecipe;
+            ServiceController.Put<ISourceService> (new IndexSourceService (vm.ObservableSources));
             dataContext = vm;
          }
 
@@ -201,6 +196,22 @@ namespace Sellars.Meal.UI
          {
             return null;
          }
+      }
+
+      public static string JoinIfValueIsNotEmpty (this IEnumerable<KeyValuePair<string,string>> values, string kvpDelimiter, string delimiter)
+      {
+         return 
+            Join(
+               values.Where (kvp => !string.IsNullOrWhiteSpace (kvp.Value)),
+               kvpDelimiter, delimiter);
+      }
+
+      public static string Join (this IEnumerable<KeyValuePair<string,string>> values, string kvpDelimiter, string delimiter)
+      {
+         return values.Aggregate (
+            new StringBuilder (),
+            (sb, kvp) => (sb.Length == 0 ? sb : sb.Append (delimiter)).Append (kvp.Key).Append (kvpDelimiter).Append (kvp.Value))
+            .ToString ();
       }
    }
 }

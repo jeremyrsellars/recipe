@@ -17,6 +17,8 @@ namespace Sellars.Meal.Svc.Persistance
          {
             Name=recipe.Name,
             Servings=recipe.Servings.ToString (),
+            Yield=recipe.Yield.ToString (),
+            YieldUnit=recipe.YieldUnit == null ? "" : recipe.YieldUnit.Name,
             Parts=recipe.Parts.Select<IRecipePart,RecipePart>(RecipePart.FromRecipePart).Where(x => x != null).ToArray (),
             Source=Sellars.Meal.Svc.Persistance.Source.FromSource(recipe.Source),
             CreatedOn=recipe.CreatedOn,
@@ -35,6 +37,8 @@ namespace Sellars.Meal.Svc.Persistance
 
       public string Name;  // {get;set;}
       public string Servings;  // {get;set;}
+      public string Yield;  // {get;set;}
+      public string YieldUnit;  // {get;set;}
       public RecipePart[] Parts;  // {get;set;}
       public Comment[] Comments;  // {get;set;}
       public Rating[] Ratings;  // {get;set;}
@@ -55,6 +59,24 @@ namespace Sellars.Meal.Svc.Persistance
             Fraction f;
             Fraction.TryParse (Servings, out f);
             return f;
+         }
+      }
+
+      Fraction IRecipe.Yield
+      {
+         get
+         {
+            Fraction f;
+            Fraction.TryParse (Yield, out f);
+            return f;
+         }
+      }
+
+      IUnit IRecipe.YieldUnit
+      {
+         get
+         {
+            return new Unit {Name = YieldUnit};
          }
       }
 

@@ -19,6 +19,7 @@ namespace Sellars.Meal.Svc.Persistance
             PreparationMethod = Tag.FromTag (recipePart.PreparationMethod),
             PreparationSeconds = (int)recipePart.PreparationTime.TotalSeconds,
             CookSeconds = (int)recipePart.CookTime.TotalSeconds,
+            ChillSeconds = (int)recipePart.ChillTime.TotalSeconds,
             Temperature = recipePart.Temperature,
             Ingredients = 
                recipePart.Ingredients
@@ -36,6 +37,7 @@ namespace Sellars.Meal.Svc.Persistance
       public Tag PreparationMethod;  // {get;set;}
       public int PreparationSeconds;  // {get;set;}
       public int CookSeconds;  // {get;set;}
+      public int ChillSeconds;  // {get;set;}
       public int Temperature;  // {get;set;}
       public IngredientDetail[] Ingredients;  // {get;set;}
       public string [] Instructions;  // {get;set;}
@@ -64,6 +66,11 @@ namespace Sellars.Meal.Svc.Persistance
       TimeSpan IRecipePart.CookTime
       {
          get { return TimeSpan.FromSeconds (CookSeconds); }
+      }
+
+      TimeSpan IRecipePart.ChillTime
+      {
+         get { return TimeSpan.FromSeconds (ChillSeconds); }
       }
 
       int IRecipePart.Temperature

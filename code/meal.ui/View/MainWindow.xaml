@@ -102,14 +102,18 @@
       </Grid.ColumnDefinitions>
       <Grid.RowDefinitions>
          <RowDefinition Height="20"/>
+         <RowDefinition Height="20"/>
          <RowDefinition/>
          <RowDefinition Height="16"/>
       </Grid.RowDefinitions>
-      <DockPanel>
+      
+      <Button Command="{Binding NewRecipeCommand}">New Recipe</Button>
+      
+      <DockPanel Grid.Row="1">
          <TextBlock DockPanel.Dock="Left" Text="Filter: " />
          <TextBox Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}" />
       </DockPanel>
-      <localControls:ExtendedTreeView ItemsSource="{Binding FilteredIndex}" x:Name="tvwIndex" Grid.Row="1" Grid.RowSpan="2" SelectedItem_="{Binding SelectedItem, Mode=TwoWay}">
+      <localControls:ExtendedTreeView ItemsSource="{Binding FilteredIndex}" x:Name="tvwIndex" Grid.Row="2" Grid.RowSpan="2" SelectedItem_="{Binding SelectedItem, Mode=TwoWay}">
          <TreeView.Resources>
             <HierarchicalDataTemplate DataType="{x:Type vm:RecipeHeaderViewModel}" 
                                       ItemsSource="{Binding Recipes}">
@@ -125,7 +129,7 @@
                   <TextBlock FontFamily="Bradley Hand ITC" FontSize="20" Text="{Binding Recipe.Name}" />
                   <TextBlock FontFamily="Bradley Hand ITC" FontSize="20">
                      <TextBlock.Text>
-                        <Binding Path="Recipe.Source"  StringFormat="{}({0})" />
+                        <Binding Path="Source.Name"  StringFormat="{}({0})" />
                      </TextBlock.Text>
                   </TextBlock>
                   <!--<v:RatingBox Rating="{Binding UserRating.Value}" Glyph="å" />-->
@@ -137,7 +141,7 @@
 
       <v:ViewOrEditRecipe DataContext="{Binding SelectedItem}" 
                           Grid.Column="1"
-                          Grid.Row="1"/>
+                          Grid.RowSpan="3"/>
       <!--<ContentPresenter Grid.Column="1"
                         Grid.Row="1"
                         DataContext="{Binding SelectedItem}">

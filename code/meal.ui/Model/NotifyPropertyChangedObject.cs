@@ -8,15 +8,16 @@ namespace Sellars.Meal.UI.Model
 {
    public class NotifyPropertyChangedObject : INotifyPropertyChanged
    {
-      public static void SetValue<T> (object sender, ref T field, T value, string propertyName, PropertyChangedEventHandler propChangedEvent)
+      public static bool SetValue<T> (object sender, ref T field, T value, string propertyName, PropertyChangedEventHandler propChangedEvent)
       {
          if (field == null && value == null)
-            return;
+            return false;
          if (field != null && field.Equals (value))
-            return;
+            return false;
          field = value;
          if (propChangedEvent != null)
             propChangedEvent (sender, new PropertyChangedEventArgs (propertyName));
+         return true;
       }
       
       #region INotifyPropertyChanged Members
@@ -36,9 +37,9 @@ namespace Sellars.Meal.UI.Model
          OnPropertyChanged (new PropertyChangedEventArgs (propertyName));
       }
 
-      protected void SetValue<T>(ref T field, T value, string propertyName)
+      protected bool SetValue<T>(ref T field, T value, string propertyName)
       {
-         SetValue<T> (this, ref field, value, propertyName, PropertyChanged);
+         return SetValue<T> (this, ref field, value, propertyName, PropertyChanged);
          //if (m_field == null && value == null)
          //   return;
          //if (m_field != null && m_field.Equals (value))

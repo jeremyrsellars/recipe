@@ -7,7 +7,18 @@ namespace Sellars.Meal.UI.Model
 {
    public class NamedItem
    {
-      public string Name{get;set;}
+      private string m_name;
+      public string Name
+      {
+         get
+         {
+            return m_name;
+         }
+         set
+         {
+            m_name = value;
+         }
+      }
 
       public override string ToString()
       {

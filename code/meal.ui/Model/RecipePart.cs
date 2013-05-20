@@ -20,6 +20,7 @@ namespace Sellars.Meal.UI.Model
             PreparationMethod = recipePart.PreparationMethod == null ? null : Tag.FromTag (recipePart.PreparationMethod),
             PreparationTime = recipePart.PreparationTime,
             CookTime = recipePart.CookTime,
+            ChillTime = recipePart.ChillTime,
             Temperature = recipePart.Temperature,
             Ingredients = new ObservableCollection<IngredientDetail> ( recipePart.Ingredients.Select<IIngredientDetail,IngredientDetail>(IngredientDetail.FromIngredientDetail)),
             Instructions = recipePart.Instructions,
@@ -33,6 +34,7 @@ namespace Sellars.Meal.UI.Model
       public Tag PreparationMethod{get;set;}
       public TimeSpan PreparationTime{get;set;}
       public TimeSpan CookTime{get;set;}
+      public TimeSpan ChillTime{get;set;}
       public int Temperature{get;set;}
       public ObservableCollection<IngredientDetail> Ingredients{get;set;}
       public string Instructions{get;set;}

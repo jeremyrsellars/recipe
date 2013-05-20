@@ -13,6 +13,8 @@ namespace Sellars.Meal.Svc.Model
    {
       string Name{get;}
       Fraction Servings{get;}
+      Fraction Yield{get;}
+      IUnit YieldUnit{get;}
       IReadonlyList<IRecipePart> Parts{get;}
       IReadonlyList<IComment> Comments{get;}
       IReadonlyList<IRating> Ratings{get;}

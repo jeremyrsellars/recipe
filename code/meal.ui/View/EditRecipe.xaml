@@ -5,17 +5,19 @@
    xmlns:c="clr-namespace:Sellars.Meal.UI.Converters"
    xmlns:view="clr-namespace:Sellars.Meal.UI.View"
    xmlns:model="clr-namespace:Sellars.Meal.UI.Model"
-   BorderThickness="40">
+   BorderThickness="4">
    <UserControl.Resources>
       <!-- Converters -->
       <c:DefaultConverter x:Key="defaultConverter"/>
       <c:FractionConverter x:Key="fractionConverter"/>
       <c:NamedItemConverter x:Key="namedItemConverter"/>
       <c:NamedItemConverter x:Key="unitConverter" Type="{x:Type model:Unit}"/>
+      <c:NamedItemConverter x:Key="tagConverter" Type="{x:Type model:Tag}"/>
       <c:SourceConverter x:Key="sourceConverter"/>
       <c:GridColumnWidthConverter x:Key="colWidthConverter"/>
       <c:BooleanToCollapsedVisibilityConverter x:Key="boolToCollapsedVisibilityConverter"/>
       <c:BooleanToCollapsedVisibilityConverter x:Key="invertedBoolToCollapsedVisibilityConverter" Inverted="true"/>
+      <c:TemperatureConverter x:Key="temperatureConverter"/>
       <c:CookTimespanConverter x:Key="shortCookTimespanConverter">
          <c:CookTimespanConverter.DayFormat>
             <sys:String>{0} day</sys:String>
@@ -73,27 +75,6 @@
          <Setter Property="StackPanel.Border"
       </Style>-->
 
-      <!-- Ingredient Detail -->
-      <DataTemplate x:Key="IngredientItemTemplate">
-         <StackPanel Orientation="Horizontal" Margin="1,3">
-            <!--<TextBox 
-               Width="{Binding ElementName=Qty, Converter={StaticResource colWidthConverter}, ConverterParameter=Qty, UpdateSourceTrigger=PropertyChanged}"
-               Text="{Binding Quantity, Converter={StaticResource fractionConverter}}" />
-            <TextBox
-               Width="{Binding ElementName=grdIngredients, Converter={StaticResource colWidthConverter}, ConverterParameter=Amount, UpdateSourceTrigger=PropertyChanged}"
-               Text="{Binding Amount, Converter={StaticResource fractionConverter}}"/>
-            <TextBox 
-               Width="{Binding ElementName=grdIngredients, Converter={StaticResource colWidthConverter}, ConverterParameter=Unit, UpdateSourceTrigger=PropertyChanged}"
-               Text="{Binding Unit, Converter={StaticResource namedItemConverter}}"/>
-            <TextBox 
-               Width="{Binding ElementName=grdIngredients, Converter={StaticResource colWidthConverter}, ConverterParameter=Ingredient, UpdateSourceTrigger=PropertyChanged}"
-               Text="{Binding Ingredient, Converter={StaticResource namedItemConverter}}"/>
-            <TextBox 
-               Width="{Binding ElementName=grdIngredients, Converter={StaticResource colWidthConverter}, ConverterParameter=Preparation, UpdateSourceTrigger=PropertyChanged}"
-               Text="{Binding Preparation}" />-->
-         </StackPanel>
-      </DataTemplate>
-
       <!-- Micro Recipe Part -->
       <DataTemplate x:Key="MicroRecipePartTemplate">
          <ToggleButton
@@ -127,7 +108,17 @@
                </ToolTip>
             </ToggleButton.ToolTip>
             <StackPanel Orientation="Vertical">
-               <TextBlock Text="{Binding Model.Name}"/>
+               <TextBlock>
+                  <TextBlock.Text>
+                     <Binding 
+                          Path="Model.Name" 
+                          Converter="{StaticResource defaultConverter}">
+                       <Binding.ConverterParameter>
+                         <c:StringNullOrEmptyValueProvider DefaultValue="Add Part"/>
+                       </Binding.ConverterParameter>
+                     </Binding>
+                  </TextBlock.Text>
+               </TextBlock>
                <TextBlock Text="{Binding Model.PreparationMethod.Name}"/>
                <TextBlock Text="{Binding Model.PreparationTime, Converter={StaticResource microCookTimespanConverter}}"/>
             </StackPanel>
@@ -187,15 +178,17 @@
                Orientation="Vertical" 
                Visibility="{Binding Visible, Converter={StaticResource boolToCollapsedVisibilityConverter}}">
               <StackPanel Orientation="Horizontal" Margin="1,3">
-                <Label>Preparation Method</Label>
-                <TextBox Text="{Binding Model.PreparationMethod.Name}" MinWidth="40"/>
-                <Label>Preparation Time</Label>
+                <Label>Prep Method</Label>
+                <TextBox Text="{Binding Model.PreparationMethod, Converter={StaticResource tagConverter}}" MinWidth="40"/>
+                <Label>Prep Time</Label>
                 <TextBox Text="{Binding Model.PreparationTime, Converter={StaticResource shortCookTimespanConverter}}" MinWidth="20"/>
                 <Label>Preheat</Label>
-                <TextBox Text="{Binding Model.Temperature}" MinWidth="20"/>
+                <TextBox Text="{Binding Model.Temperature, Converter={StaticResource temperatureConverter}}" MinWidth="20"/>
                 <Label>°F</Label>
                 <Label>Cook Time</Label>
-                <TextBox Text="{Binding Model.CookTime, Converter={StaticResource shortCookTimespanConverter}}" MinWidth="10"></TextBox>
+                <TextBox Text="{Binding Model.CookTime, Converter={StaticResource shortCookTimespanConverter}}" MinWidth="10"/>
+                <Label>Chill Time</Label>
+                <TextBox Text="{Binding Model.ChillTime, Converter={StaticResource shortCookTimespanConverter}}" MinWidth="10"/>
               </StackPanel>
               <ListView
                  ItemsSource="{Binding Ingredients}"
@@ -232,20 +225,21 @@
                          <DataTemplate>
                            <TextBox Text="{Binding Unit, Converter={StaticResource unitConverter}}"
                                     BorderThickness="0"
-                                    Width="{Binding Width, ElementName=colUnit, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    Width="{Binding Width, ElementName=colUnit, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                    />
                          </DataTemplate>
                        </GridViewColumn.CellTemplate>
                      </GridViewColumn>
-                     <GridViewColumn x:Name="colIngredient" Header="Ingredient" Width="100">
+                     <GridViewColumn x:Name="colIngredient" Header="Ingredient" Width="150">
                        <GridViewColumn.CellTemplate>
                          <DataTemplate>
                            <TextBox Text="{Binding Ingredient}"
                                     BorderThickness="0"
-                                    Width="{Binding Width, ElementName=colIngreditn, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    Width="{Binding Width, ElementName=colIngredient, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                          </DataTemplate>
                        </GridViewColumn.CellTemplate>
                      </GridViewColumn>
-                     <GridViewColumn x:Name="colPreparation" Header="Preparation">
+                     <GridViewColumn x:Name="colPreparation" Header="Preparation" Width="200">
                        <GridViewColumn.CellTemplate>
                          <DataTemplate>
                            <TextBox Text="{Binding Preparation}"
@@ -277,11 +271,13 @@
                   </Label>
                 </DockPanel>
               </ToggleButton>
-              <TextBox 
-                  AcceptsReturn="True" 
-                  Visibility="{Binding ElementName=InstructionsVisible, Path=IsChecked, Converter={StaticResource invertedBoolToCollapsedVisibilityConverter}, Mode=OneWay}"
-                  Text="{Binding Model.Instructions}"></TextBox>
-            </StackPanel>
+                  <TextBox AcceptsReturn="True" 
+                           Visibility="{Binding ElementName=InstructionsVisible, Path=IsChecked, Converter={StaticResource invertedBoolToCollapsedVisibilityConverter}, Mode=OneWay}"
+                           ScrollViewer.VerticalScrollBarVisibility="Visible"
+                           TextWrapping="WrapWithOverflow"
+                           MinLines="8"
+                           Text="{Binding Model.Instructions}" />
+               </StackPanel>
          </Border>
        </DockPanel>
      </DataTemplate>
@@ -334,22 +330,61 @@
          Padding="5"
          >
          <DockPanel>
-            <StackPanel 
-               Orientation="Horizontal" 
-               Margin="0,3"
-               DockPanel.Dock="Top"
-               >
+            <Grid DockPanel.Dock="Top" Margin="0,3">
+               <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="auto" />
+                  <ColumnDefinition Width="auto" />
+                  <ColumnDefinition Width="auto" />
+                  <ColumnDefinition />
+                  <ColumnDefinition />
+               </Grid.ColumnDefinitions>
+               <Grid.RowDefinitions>
+                  <RowDefinition Height="22" />
+                  <RowDefinition Height="22" />
+               </Grid.RowDefinitions>
+
                <Label>Servings:</Label>
-               <TextBox Text="{Binding Recipe.Servings, Converter={StaticResource fractionConverter}}" Width="40"></TextBox>
-               <Label>Source:</Label>
-               <ComboBox 
-                  Width="120"
-                  SelectedItem="{Binding Recipe.Source, Converter={StaticResource sourceConverter}}" 
-                  ItemsSource="{Binding Sources}"></ComboBox>
+               <Label Grid.Row="1">Yield:</Label>
 
-               <view:RatingBox Rating="{Binding UserRating}" Width="120" Height="20" Glyph="," />
 
-               <ItemsControl 
+               <TextBox Grid.Column="1" Text="{Binding Recipe.Servings, Converter={StaticResource fractionConverter}}" Width="40" />
+               <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal">
+                  <TextBox Text="{Binding Recipe.Yield, Converter={StaticResource fractionConverter}}" Width="25" />
+                  <TextBox Text="{Binding Recipe.YieldUnit, Converter={StaticResource unitConverter}}" Width="25" />
+               </StackPanel>
+
+               <StackPanel Grid.Column="2" Grid.RowSpan="1" Orientation="Horizontal">
+                  <Label>Source:</Label>
+                  <ComboBox 
+                     Width="120"
+                     ItemsSource="{Binding Sources}"
+                     DisplayMemberPath="Name"
+                     Text="{Binding SourceName}"
+                     IsEditable="True">
+                     <!--
+                     SelectedItem="{Binding Source}"
+                     <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                           <StackPanel>
+                              <StackPanel Orientation="Horizontal"
+                                          Visibility="{Binding IsReadOnly, Converter={StaticResource invertedBoolToCollapsedVisibilityConverter}}">
+                                 <TextBlock Text="New:" Padding="0 0 3 0" />
+                                 <TextBox Text="{Binding Name}"
+                                          Width="65" />
+                              </StackPanel>
+                              <TextBlock Text="{Binding Name}"
+                                         Padding="3 0 3 0"
+                                         Visibility="{Binding IsReadOnly, Converter={StaticResource boolToCollapsedVisibilityConverter}}"/>
+                           </StackPanel>
+                        </DataTemplate>
+                     </ComboBox.ItemTemplate>
+                     -->
+                  </ComboBox>
+               </StackPanel>
+
+               <view:RatingBox Grid.Column="3" Grid.RowSpan="2" Rating="{Binding UserRating.Rating, Mode=TwoWay}" Width="120" Height="20" />
+
+               <ItemsControl Grid.Column="4" Grid.RowSpan="2"
                   DockPanel.Dock="Top"
                   ItemsSource="{Binding RecipeParts}"
                   ItemTemplate="{StaticResource MicroRecipePartTemplate}">
@@ -361,13 +396,13 @@
                      </ItemsPanelTemplate>
                   </ItemsControl.ItemsPanel>
                </ItemsControl>
-            </StackPanel>
+            </Grid>
+            <Button Height="21" DockPanel.Dock="Bottom" Command="{Binding SaveCommand}">Save</Button>
             <ItemsControl 
                DockPanel.Dock="Top"
                ItemsSource="{Binding RecipeParts}"
                ItemTemplate="{StaticResource RecipePartTemplate}">
             </ItemsControl>
-            <Button Height="21" DockPanel.Dock="Bottom" Command="{Binding SaveCommand}">Save</Button>
          </DockPanel>
       </Border>
    </DockPanel>

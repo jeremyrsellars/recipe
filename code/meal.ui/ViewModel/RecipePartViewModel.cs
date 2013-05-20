@@ -37,6 +37,8 @@ namespace Sellars.Meal.UI.ViewModel
                m_ingredients.CollectionChanged += 
                   (s, dea) =>
                   {
+                     if (m_model.Ingredients == null)
+                        m_model.Ingredients = new System.Collections.ObjectModel.ObservableCollection<IngredientDetail> ();
                      m_model.Ingredients.Clear ();
                      foreach (var ingredient in m_ingredients)
                         m_model.Ingredients.Add (ingredient);

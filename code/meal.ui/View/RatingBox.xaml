@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="20" d:DesignWidth="100">
-   <Grid ToolTip="{Binding Rating}" MouseLeave="OnMouseLeave">
+   <Grid ToolTip="{Binding UserRating.Rating}" MouseLeave="OnMouseLeave">
       <TextBlock Name="txtMaxRating" FontFamily="Webdings" FontSize="20" Foreground="Silver" MouseDown="OnMouseDown" MouseMove="OnMouseMove" MouseUp="OnMouseUp"/>
       <TextBlock Name="txtRating" FontFamily="Webdings" FontSize="20" Foreground="#CC1111" MouseDown="OnMouseDown" MouseMove="OnMouseMove" MouseUp="OnMouseUp" />
    </Grid>

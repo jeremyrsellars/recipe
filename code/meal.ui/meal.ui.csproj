@@ -92,8 +92,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\CookTimespanConverter.cs" />
     <Compile Include="Converters\NullToCollapsedVisibilityConverter.cs" />
+    <Compile Include="Service\IndexSourceService.cs" />
+    <Compile Include="Service\ISourceService.cs" />
     <Compile Include="ViewModel\SelectedIndexViewModel.cs" />
+    <Compile Include="ViewModel\SourceViewModel.cs" />
     <Compile Include="Windows\Controls\ExtendedTreeView.cs" />
     <Compile Include="Windows\Controls\SelectedItemDataTemplateSelector.cs" />
     <None Include="app.config" />
@@ -150,7 +154,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Converters\CookTimespanConverter.cs" />
+    <Compile Include="Converters\TemperatureConverter.cs" />
     <Compile Include="Converters\BooleanToCollapsedVisibilityConverter.cs" />
     <Compile Include="Converters\GridColumnWidthConverter.cs" />
     <Compile Include="Converters\DefaultConverter.cs" />

@@ -13,6 +13,7 @@ namespace Sellars.Meal.Svc.Model
       ITag PreparationMethod{get;}
       TimeSpan PreparationTime{get;}
       TimeSpan CookTime{get;}
+      TimeSpan ChillTime{get;}
       int Temperature{get;}
       IReadonlyList<IIngredientDetail> Ingredients{get;}
       string Instructions{get;}
