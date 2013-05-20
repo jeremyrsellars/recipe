@@ -85,7 +85,9 @@ namespace Sellars.Meal.Svc.Service
 
       public FileSystemRecipeService ()
       {
-         string path = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.MyDocuments), "My Recipes");
+         string path = 
+            Environment.GetEnvironmentVariable("RECIPE_PATH") ??
+            Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.MyDocuments), "My Recipes");
          RootPath = path;
       }
 
