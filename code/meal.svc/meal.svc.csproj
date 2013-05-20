@@ -57,9 +57,6 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Lucene.Net">
-      <HintPath>..\..\release\Lucene.Net.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -79,9 +76,7 @@
     <Compile Include="Persistance\Source.cs" />
     <Compile Include="Sellars\Collections\Generic\ExceptList.cs" />
     <Compile Include="Sellars\Collections\Generic\ReadonlyList.cs" />
-    <Compile Include="Sellars\Indexing\IndexServices.cs" />
     <Compile Include="Service\FileSystemRecipeService.cs" />
-    <Compile Include="Service\IndexRecipeService.cs" />
     <Compile Include="Service\IRecipeService.cs" />
     <Compile Include="Persistance\Comment.cs" />
     <Compile Include="Persistance\Ingredient.cs" />
