@@ -234,9 +234,14 @@
                      <GridViewColumn x:Name="colIngredient" Header="Ingredient" Width="150">
                        <GridViewColumn.CellTemplate>
                          <DataTemplate>
-                           <TextBox Text="{Binding Ingredient}"
+                           <!--<TextBox Text="{Binding Ingredient}"
                                     BorderThickness="0"
-                                    Width="{Binding Width, ElementName=colIngredient, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    Width="{Binding Width, ElementName=colIngredient, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>-->
+                           <ComboBox Text="{Binding Ingredient}" SelectedItem="{Binding Ingredient}"
+                                     ItemsSource="{Binding DataContext.AllIngredients, RelativeSource={RelativeSource AncestorType={x:Type view:EditRecipe}}}"
+                                     BorderThickness="0"
+                                     IsEditable="True"
+                                     Width="{Binding Width, ElementName=colIngredient, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                          </DataTemplate>
                        </GridViewColumn.CellTemplate>
                      </GridViewColumn>

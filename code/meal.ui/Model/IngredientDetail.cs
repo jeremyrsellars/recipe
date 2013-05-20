@@ -15,9 +15,11 @@ namespace Sellars.Meal.UI.Model
    {
       public static IngredientDetail FromIngredientDetail (IIngredientDetail ingredientDetail)
       {
+         Sellars.Data.Model.ModelId<IRecipe> id = ingredientDetail.Ingredient.Id;
          IngredientDetail i = new IngredientDetail
          {
             Ingredient = ingredientDetail.Ingredient.Name,
+            IngredientId = id == null ? Guid.Empty : id.Id,
             Quantity = ingredientDetail.Quantity,
             Amount = ingredientDetail.Amount,
             AmountMax = ingredientDetail.AmountMax,
@@ -69,6 +71,18 @@ namespace Sellars.Meal.UI.Model
          set
          {
             SetValue (ref m_ingredient, value, "Ingredient");
+         }
+      }
+      
+      public Guid IngredientId
+      {
+         get
+         {
+            return m_ingredientId;
+         }
+         set
+         {
+            SetValue (ref m_ingredientId, value, "IngredientId");
          }
       }
 
@@ -147,7 +161,15 @@ namespace Sellars.Meal.UI.Model
 
       IIngredient IIngredientDetail.Ingredient
       {
-         get { return new Ingredient {Name = m_ingredient}; }
+         get
+         {
+            return 
+               new Ingredient
+                  {
+                     Name = m_ingredient,
+                     Id = new Data.Model.ModelId<IRecipe> (m_ingredientId)
+                  };
+         }
       }
 
       Fraction IIngredientDetail.Quantity
@@ -172,6 +194,7 @@ namespace Sellars.Meal.UI.Model
 
       private int m_index;
       private string m_ingredient;
+      private Guid m_ingredientId;
       private string m_preparation;
       private Fraction m_quantity;
       private Fraction m_amount;

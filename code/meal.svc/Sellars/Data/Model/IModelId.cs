@@ -10,4 +10,13 @@ namespace Sellars.Data.Model
    {
       ModelId<TModel> Id{get;}
    }
+   public interface ICandidateKey
+   {
+      object Key{get;}
+   }
+   public interface ICandidateKey<TModel,TId> : ICandidateKey
+      where TModel : IModelId<TModel>
+   {
+      new TId Key{get;}
+   }
 }

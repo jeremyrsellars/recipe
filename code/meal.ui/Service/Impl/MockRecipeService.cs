@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Sellars.Meal.UI.Service.Impl
 {
    public class MockRecipeDataProvider : Sellars.Meal.Svc.Service.IRecipeService
    {
-      public static string id = "mock";
+      public static Guid id = Guid.NewGuid ();
       
       public IRecipe LoadRecipe (string filename)
       {
@@ -54,6 +55,10 @@ namespace Sellars.Meal.UI.Service.Impl
          return recipe;
       }
       
+      public IRecipe GetRecipe(ICandidateKey recipeId)
+      {
+         return GetRecipe((ModelId<IRecipe>)null);
+      }
       public IRecipe GetRecipe(ModelId<IRecipe> recipeId)
       {
          return new Recipe
@@ -186,6 +191,11 @@ Let cool slowly or top will fall."
          return new ReadonlyList<ModelId<IRecipe>> (new [] {new ModelId<IRecipe> (id)});
       }
 
+      public IReadonlyList<ICandidateKey> SearchRecipeKeys()
+      {
+         throw new NotImplementedException();
+      }
+
       #region IService Members
 
       public void Initialize(Sellars.Service.ServiceController controller)
@@ -195,3 +205,4 @@ Let cool slowly or top will fall."
       #endregion
    }
 }
+#endif

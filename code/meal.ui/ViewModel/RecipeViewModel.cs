@@ -32,6 +32,7 @@ namespace Sellars.Meal.UI.ViewModel
       public ICommand SaveCommand{get;private set;}
       public ICommand PrintCommand{get;private set;}
       public ICommand DeleteTagCommand{get;private set;}
+      public ICommand ShowRecipeCommand{get;set;}
       
       public bool
       EditMode
@@ -280,6 +281,15 @@ namespace Sellars.Meal.UI.ViewModel
          }
       }
       
+      public IEnumerable<IIngredient>
+      AllIngredients
+      {
+         get
+         {
+            return m_allIngredients ?? (m_allIngredients = new ObservableCollection<IIngredient> (GetIngredientsCore ()));
+         }
+      }
+      
       public RatingViewModel UserRating
       {
          get
@@ -297,7 +307,7 @@ namespace Sellars.Meal.UI.ViewModel
       {
          get
          {
-            return CreateDocument (m_recipe);
+            return CreateDocument (m_recipe, ShowRecipeCommand);
          }
       }
 
@@ -458,6 +468,15 @@ namespace Sellars.Meal.UI.ViewModel
          }
       }
 
+      private IEnumerable<IIngredient>
+      GetIngredientsCore ()
+      {
+         var ingredients = 
+            ServiceController.Get<Sellars.Meal.UI.Service.IIngredientService> ().GetIngredients ()
+               .OrderBy (s => s.Name);
+         return ingredients;
+      }
+
       private IEnumerable<string>
       GetTagsCore ()
       {
@@ -524,7 +543,7 @@ namespace Sellars.Meal.UI.ViewModel
       }
 
       public static Doc.FlowDocument
-      CreateDocument (IRecipe recipe)
+      CreateDocument (IRecipe recipe, ICommand linkToRecipeCommand)
       {
          Doc.FlowDocument doc = new Doc.FlowDocument ();
          doc.PagePadding = new System.Windows.Thickness (40);
@@ -650,7 +669,27 @@ namespace Sellars.Meal.UI.ViewModel
                foreach (var ingredient in part.Ingredients)
                {
                   partIngredients.Inlines.Add (new Doc.LineBreak ());
-                  partIngredients.Inlines.Add (new Doc.Run (IngredientToString (ingredient)));
+                  Sellars.Data.Model.ModelId<IRecipe> recipeId;
+                  if (ingredient.Ingredient == null)
+                     recipeId = null;
+                  else
+                     recipeId = ingredient.Ingredient.Id;
+
+                  string text = IngredientToString (ingredient);
+                  string ingredientName = ingredient.Ingredient.Name;
+                  if (recipeId != null && recipeId.Id != Guid.Empty && linkToRecipeCommand != null && !string.IsNullOrEmpty (ingredientName))
+                  {
+                     int iName = text.IndexOf (ingredientName);
+                     if (iName > 0)
+                        partIngredients.Inlines.Add (new Doc.Run (text.Substring (0, iName)));
+                     partIngredients.Inlines.Add (new Doc.Hyperlink (new Doc.Run (ingredientName)){Command=linkToRecipeCommand, CommandParameter=recipeId});
+                     if (text.Length - iName - ingredientName.Length > 0)
+                        partIngredients.Inlines.Add (new Doc.Run (text.Substring (iName + ingredientName.Length)));
+                  }
+                  else
+                  {
+                     partIngredients.Inlines.Add (new Doc.Run (text));
+                  }
                };
             }
 
@@ -683,7 +722,7 @@ namespace Sellars.Meal.UI.ViewModel
          return doc;
       }
 
-      private static string IngredientToString(IIngredientDetail ing)
+      internal static string IngredientToString(IIngredientDetail ing)
       {
          StringBuilder s = new StringBuilder ();
          if (ing.Quantity != Fraction.Zero)
@@ -746,6 +785,7 @@ namespace Sellars.Meal.UI.ViewModel
       private bool? m_autoSave;
       private bool m_isRatingDirty;
       private static ObservableCollection<SourceViewModel> m_allSources;
+      private static ObservableCollection<IIngredient> m_allIngredients;
       private static ObservableCollection<string> m_allTags;
       private static ExceptList<string> m_remainingTags;
       private ObservableCollection<string> m_usedTagNames;

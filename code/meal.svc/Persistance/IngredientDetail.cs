@@ -15,9 +15,11 @@ namespace Sellars.Meal.Svc.Persistance
       {
          if (ingredientDetail == null)
             return null;
+         Sellars.Data.Model.ModelId<IRecipe> recipeId = ingredientDetail.Ingredient == null ? null : ingredientDetail.Ingredient.Id;
          IngredientDetail i = new IngredientDetail
          {
             Ingredient = ingredientDetail.Ingredient == null ? "" : ingredientDetail.Ingredient.Name,
+            IngredientRecipeId = recipeId == null ? Guid.Empty : recipeId.Id,
             Quantity = ingredientDetail.Quantity.ToString (),
             Amount = ingredientDetail.Amount.ToString (),
             AmountMax = ingredientDetail.AmountMax.ToString (),
@@ -31,6 +33,7 @@ namespace Sellars.Meal.Svc.Persistance
       }
       
       public string Ingredient;  // {get;set;}
+      public Guid IngredientRecipeId;  // {get;set;}
       public string Preparation;  // {get;set;}
       public string Quantity;  // {get;set;}
       public string Amount;  // {get;set;}
@@ -41,7 +44,7 @@ namespace Sellars.Meal.Svc.Persistance
 
       IIngredient IIngredientDetail.Ingredient
       {
-         get { return new Ingredient {Name=Ingredient}; }
+         get { return new Ingredient {Name=Ingredient, RecipeId = IngredientRecipeId}; }
       }
 
       IReadonlyList<string> IIngredientDetail.Preparation

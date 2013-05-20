@@ -96,6 +96,8 @@
     <Compile Include="Converters\CookTimespanConverter.cs" />
     <Compile Include="Converters\NullToCollapsedVisibilityConverter.cs" />
     <Compile Include="Model\FractionRange.cs" />
+    <Compile Include="Service\IIngredientService.cs" />
+    <Compile Include="Service\IndexIngredientService.cs" />
     <Compile Include="Service\IDocumentPrintingService.cs" />
     <Compile Include="Service\Impl\DocumentPrintingService.cs" />
     <Compile Include="Service\ITagService.cs" />

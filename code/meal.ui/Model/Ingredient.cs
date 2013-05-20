@@ -17,6 +17,7 @@ namespace Sellars.Meal.UI.Model
          };
          return i;
       }
-      
+
+      public Data.Model.ModelId<IRecipe> Id{get;set;}
    }
 }

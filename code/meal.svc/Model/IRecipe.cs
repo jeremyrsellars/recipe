@@ -9,9 +9,9 @@ using Sellars.Collections.Generic;
 
 namespace Sellars.Meal.Svc.Model
 {
-   public interface IRecipe : IModelId<IRecipe>
+   public interface IRecipe : IModelId<IRecipe>, ICandidateKey<IRecipe,string>, IRecipeHeader
    {
-      string Name{get;}
+      new string Name{get;}
       Fraction Servings{get;}
       Fraction Yield{get;}
       IUnit YieldUnit{get;}

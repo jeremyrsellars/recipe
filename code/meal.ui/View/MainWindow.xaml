@@ -8,8 +8,7 @@
    xmlns:v="clr-namespace:Sellars.Meal.UI.View"
    xmlns:vm="clr-namespace:Sellars.Meal.UI.ViewModel"
    Title="Recipe" Width="1024" Height="768" 
-   Icon="/App.ico"
-   >
+   Icon="/App.ico">
    <!--WindowStyle="None"-->
    <Window.Resources>
       <c:NullToCollapsedVisibilityConverter x:Key="nullToVis" />

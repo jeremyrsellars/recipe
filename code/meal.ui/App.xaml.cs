@@ -25,7 +25,8 @@ namespace Sellars.Meal.UI
       {
          var window = new Sellars.Meal.UI.View.MainWindow ();
 
-         ServiceController.Put<IRecipeService> (new FileSystemRecipeService ());
+         //ServiceController.Put<IRecipeService> (new FileSystemRecipeService ());
+         ServiceController.Put<IRecipeService> (IndexRecipeService.CreateIndex ());
 
          object dataContext;
          
@@ -61,6 +62,7 @@ namespace Sellars.Meal.UI
             vm.Recipe = newRecipe;
             ServiceController.Put<ISourceService> (new IndexSourceService (vm.ObservableSources));
             ServiceController.Put<ITagService> (new IndexTagService (vm.ObservableTags));
+            ServiceController.Put<Sellars.Meal.UI.Service.IIngredientService> (new IndexIngredientService (vm.ObservableIngredients));
             ServiceController.Put<IDocumentPrintingService> (new DocumentPrintingService ());
             dataContext = vm;
          }
@@ -202,7 +204,7 @@ namespace Sellars.Meal.UI
          IRecipeService recipeService = ServiceController.Get<IRecipeService> ();
          return 
             recipeService
-               .SearchRecipes ()
+               .SearchRecipeKeys ()
                .Select (recipeId => recipeService.GetRecipeNoThrow (recipeId))
                .Where (recipe => recipe != null)
                .OrderBy (recipe => recipe.Name)
@@ -217,7 +219,7 @@ namespace Sellars.Meal.UI
                         vm = new RecipeHeaderViewModel (){Key = key, Recipes = new List<RecipeViewModel> ()};
                         list.Add (vm);
                      }
-                     vm.Recipes.Add (new RecipeViewModel {FileName=recipe.Id.Id, Recipe=Sellars.Meal.UI.Model.Recipe.FromRecipe (recipe)});
+                     vm.Recipes.Add (new RecipeViewModel {FileName=recipe.Key, Recipe=Sellars.Meal.UI.Model.Recipe.FromRecipe (recipe)});
                      return list;
                   })
                .OrderBy (vm => vm.Key)
@@ -228,6 +230,18 @@ namespace Sellars.Meal.UI
    static class Extensions
    {
       public static IRecipe GetRecipeNoThrow (this IRecipeService service, ModelId<IRecipe> id)
+      {
+         try
+         {
+            return service.GetRecipe (id);
+         }
+         catch
+         {
+            return null;
+         }
+      }
+
+      public static IRecipe GetRecipeNoThrow (this IRecipeService service, ICandidateKey id)
       {
          try
          {

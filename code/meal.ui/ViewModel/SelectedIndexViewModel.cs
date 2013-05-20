@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
+using Sellars.Meal.Svc.Model;
 using Sellars.Meal.UI.Service;
 using Sellars.Meal.UI;
 using Sellars.Windows.Input;
@@ -17,8 +18,10 @@ namespace Sellars.Meal.UI.ViewModel
       {
          m_observableSources = new ObservableCollection<Meal.Svc.Model.ISource> ();
          m_observableTags = new ObservableCollection<string> ();
+         m_observableIngredients = new ObservableCollection<IIngredient> ();
          NewRecipeCommand = new RelayCommand (NewRecipeExecute);
          PrintRecipeCommand = new RelayCommand (PrintRecipeExecute, PrintRecipeEnabled);
+         SelectRecipeCommand = new RelayCommand (SelectRecipeExecute, SelectRecipeEnabled);
       }
 
       public string Filter
@@ -83,6 +86,24 @@ namespace Sellars.Meal.UI.ViewModel
                      .GroupBy (t => t)
                      .Select (g => g.Key)
                      .ToList ();
+               var ingredients =
+                  recipes
+                     .SelectMany(rvm => rvm.Recipe.Parts)
+                     .SelectMany(rpvm => rpvm.Ingredients)
+                     .Select (id => ((IIngredientDetail)id).Ingredient);
+               var recipeNameIngredients =
+                  recipes
+                     .Select(rvm => new Model.Ingredient {Id = rvm.Recipe.Id, Name = rvm.Recipe.Name});
+               Ingredients = 
+                  recipeNameIngredients
+                     .Union (ingredients)
+                     .GroupBy (i => i.Name)
+                     .Select (g => g.First ())
+                     .ToList ();
+               foreach (var recipe in recipes)
+               {
+                  recipe.ShowRecipeCommand = SelectRecipeCommand;
+               }
             }
          }
       }
@@ -154,19 +175,29 @@ namespace Sellars.Meal.UI.ViewModel
          }
       }
 
-      public ICommand NewRecipeCommand{get;set;}
-      private ICommand m_printRecipeCommand;
-      public ICommand PrintRecipeCommand
+      public List<Sellars.Meal.Svc.Model.IIngredient>
+      Ingredients
       {
          get
          {
-            return m_printRecipeCommand;
+            return m_ingredients ?? (m_ingredients = new List<Sellars.Meal.Svc.Model.IIngredient> ());
          }
-         private set
+         set
          {
-            m_printRecipeCommand = value;
+            if (OnPropertyChanged("Ingredients", ref m_ingredients, value))
+            {
+               m_observableIngredients.Clear ();
+               foreach (Meal.Svc.Model.IIngredient ingredient in value)
+               {
+                  m_observableIngredients.Add (ingredient);
+               }
+            }
          }
       }
+
+      public ICommand NewRecipeCommand{get;set;}
+      public ICommand PrintRecipeCommand{get;set;}
+      public ICommand SelectRecipeCommand{get;set;}
 
       internal ObservableCollection<Meal.Svc.Model.ISource> ObservableSources
       {
@@ -181,6 +212,14 @@ namespace Sellars.Meal.UI.ViewModel
          get
          {
             return m_observableTags;
+         }
+      }
+
+      internal ObservableCollection<Meal.Svc.Model.IIngredient> ObservableIngredients
+      {
+         get
+         {
+            return m_observableIngredients;
          }
       }
 
@@ -210,13 +249,33 @@ namespace Sellars.Meal.UI.ViewModel
          docPrintingService.PrintDocument (recipeVM.Document, recipeVM.FileName ?? recipeVM.Recipe.Name);
       }
 
+      private bool SelectRecipeEnabled (object parameter)
+      {
+         return parameter is Sellars.Data.Model.ModelId<IRecipe>;
+      }
+
+      private void SelectRecipeExecute (object parameter)
+      {
+         var recipeId = parameter as Sellars.Data.Model.ModelId<IRecipe>;
+         if (recipeId == null)
+            return;
+         var selectedItem = 
+            m_index
+               .SelectMany (rhvm => rhvm.Recipes)
+               .FirstOrDefault (rvm => rvm.Recipe.Id != null && rvm.Recipe.Id.Id == recipeId.Id);
+         if (selectedItem != null)
+            SelectedItem = selectedItem;
+      }
+
       private string m_filter;
       private List<RecipeHeaderViewModel> m_index;
       private List<RecipeHeaderViewModel> m_filteredIndex;
       private List<Model.Source> m_sources;
+      private List<Sellars.Meal.Svc.Model.IIngredient> m_ingredients;
       private List<string> m_tags;
       private ObservableCollection<Meal.Svc.Model.ISource> m_observableSources;
       private ObservableCollection<string> m_observableTags;
+      private ObservableCollection<IIngredient> m_observableIngredients;
       private RecipeViewModel m_recipe;
       private object m_selectedItem;
    }

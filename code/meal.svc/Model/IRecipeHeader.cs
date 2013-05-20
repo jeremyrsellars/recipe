@@ -7,8 +7,9 @@ using Sellars.Data.Model;
 
 namespace Sellars.Meal.Svc.Model
 {
-   public interface IIngredient : IModelId<IRecipe>
+   public interface IRecipeHeader : IModelId<IRecipe>, ICandidateKey<IRecipe,string>
    {
       string Name{get;}
+      double Rating{get;}
    }
 }

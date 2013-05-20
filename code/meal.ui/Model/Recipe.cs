@@ -32,6 +32,9 @@ namespace Sellars.Meal.UI.Model
             r.Ratings= new List<Rating> (recipe.Ratings.Select<IRating,Rating>(Rating.FromRating));
          if (recipe.Tags != null)
             r.Tags= new List<Tag> (recipe.Tags.Select<ITag,Tag>(Tag.FromTag));
+         r.m_key = recipe.Key;
+         r.Id = recipe.Id ?? new ModelId<IRecipe> (new Guid ());
+
          return r;
       }
       
@@ -121,6 +124,27 @@ namespace Sellars.Meal.UI.Model
          }
       }
 
+      double IRecipeHeader.Rating
+      {
+         get
+         {
+            double ratingSum = 0;
+
+            if (m_ratings == null || m_ratings.Count == 0)
+               return ratingSum;
+
+            double ct = 0;
+            foreach (var rating in m_ratings)
+            {
+               ct++;
+               ratingSum += rating.Value;
+            }
+            if (ct == 0)
+               return 0;
+            return ratingSum / ct;
+         }
+      }
+
       IUnit IRecipe.YieldUnit
       {
          get
@@ -168,9 +192,26 @@ namespace Sellars.Meal.UI.Model
          }
       }
 
+      string ICandidateKey<IRecipe,string>.Key
+      {
+         get
+         {
+            return m_key;
+         }
+      }
+
+      object ICandidateKey.Key
+      {
+         get
+         {
+            return m_key;
+         }
+      }
+
       private List<RecipePart> m_parts;
       private List<Comment> m_comments;
       private List<Rating> m_ratings;
       private List<Tag> m_tags;
+      private string m_key;
    }
 }

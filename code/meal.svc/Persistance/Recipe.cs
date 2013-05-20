@@ -4,18 +4,20 @@ using System.Linq;
 using System.Text;
 
 using Sellars.Collections.Generic;
+using Sellars.Data.Model;
 using Sellars.Meal.Svc.Model;
 
 namespace Sellars.Meal.Svc.Persistance
 {
    [Serializable]
-   public class Recipe : IRecipe
+   public class Recipe : IRecipe, IModelId<Recipe>
    {
       public static Recipe FromRecipe (IRecipe recipe)
       {
          Recipe r = new Recipe
          {
             Name=recipe.Name,
+            Id = (recipe.Id == null || recipe.Id.Id == Guid.Empty) ? Guid.NewGuid () : recipe.Id.Id,
             Servings=recipe.Servings.ToString (),
             Yield=recipe.Yield.ToString (),
             YieldUnit=recipe.YieldUnit == null ? "" : recipe.YieldUnit.Name,
@@ -46,6 +48,28 @@ namespace Sellars.Meal.Svc.Persistance
       public ISource Source;  // {get;set;}
       public DateTime CreatedOn;  // {get;set;}
       public string CreatedBy;  // {get;set;}
+      public Guid Id;  // {get;set;}
+
+      double IRecipeHeader.Rating
+      {
+         get
+         {
+            if (Ratings == null)
+               return 0;
+            double ct = Ratings.Count ();
+            double value =
+               Ratings.Aggregate(
+                  (double)0, 
+                  (sum, rating) => sum + rating.Value, 
+                  sum => sum / ct);
+            return value;
+         }
+      }
+
+      string IRecipeHeader.Name
+      {
+         get { return Name; }
+      }
 
       string IRecipe.Name
       {
@@ -136,13 +160,42 @@ namespace Sellars.Meal.Svc.Persistance
 
       Sellars.Data.Model.ModelId<IRecipe> Sellars.Data.Model.IModelId<IRecipe>.Id
       {
-         get { return new Data.Model.ModelId<IRecipe> (FileName); }
+         get { return new Data.Model.ModelId<IRecipe> (Id); }
       }
 
       #endregion
 
+      #region IModelId<Recipe> Members
+
+      ModelId<Recipe> IModelId<Recipe>.Id
+      {
+         get
+         {
+            if (Id == Guid.Empty)
+               Id = Guid.NewGuid ();
+            return new ModelId<Recipe> (Id);
+         }
+      }
+
+      #endregion
+
+      string ICandidateKey<IRecipe,string>.Key
+      {
+         get
+         {
+            return FileName;
+         }
+      }
+
+      object ICandidateKey.Key
+      {
+         get
+         {
+            return FileName;
+         }
+      }
+
       [NonSerialized]
       public string FileName;  // {get;set;}
-
    }
 }

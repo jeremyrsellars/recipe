@@ -58,17 +58,40 @@ namespace Sellars.Meal.UI.ViewModel
          }
       }
 
-      public string Ingredient
+      public object Ingredient
       {
          get
          {
-            return m_ingredientDetail.Ingredient;
+            return ((Sellars.Meal.Svc.Model.IIngredientDetail)m_ingredientDetail).Ingredient;
          }
          set
          {
-            if (m_ingredientDetail.Ingredient == value)
+            string name;
+            Guid id;
+            if (value is string || value == null)
+            {
+               name = (string)value;
+               id = Guid.Empty;
+            }
+            else if (value is Sellars.Meal.Svc.Model.IIngredient)
+            {
+               var ingredient = (Sellars.Meal.Svc.Model.IIngredient)value;
+               name = ingredient.Name;
+               if (ingredient.Id == null)
+                  id = Guid.Empty;
+               else
+                  id = ingredient.Id.Id;
+            }
+            else
+            {
+               throw new ArgumentException ();
+            }
+
+            if (name == m_ingredientDetail.Ingredient && id == m_ingredientDetail.IngredientId)
                return;
-            m_ingredientDetail.Ingredient = value;
+
+            m_ingredientDetail.Ingredient = name;
+            m_ingredientDetail.IngredientId = id;
             OnPropertyChanged ("Ingredient");
          }
       }
