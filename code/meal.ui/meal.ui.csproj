@@ -94,10 +94,14 @@
     </ApplicationDefinition>
     <Compile Include="Converters\CookTimespanConverter.cs" />
     <Compile Include="Converters\NullToCollapsedVisibilityConverter.cs" />
+    <Compile Include="Service\ITagService.cs" />
     <Compile Include="Service\IndexSourceService.cs" />
+    <Compile Include="Service\IndexTagService.cs" />
     <Compile Include="Service\ISourceService.cs" />
+    <Compile Include="ViewModel\RatingViewModel.cs" />
     <Compile Include="ViewModel\SelectedIndexViewModel.cs" />
     <Compile Include="ViewModel\SourceViewModel.cs" />
+    <Compile Include="ViewModel\TagViewModel.cs" />
     <Compile Include="Windows\Controls\ExtendedTreeView.cs" />
     <Compile Include="Windows\Controls\SelectedItemDataTemplateSelector.cs" />
     <None Include="app.config" />
@@ -108,7 +112,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </None>
-    <Page Include="View\RatingBox.xaml">
+    <Page Include="View\Rating.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -139,9 +143,6 @@
     <Compile Include="Service\UserService.cs" />
     <Compile Include="ViewModel\RecipeHeaderViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
-    <Compile Include="View\RatingBox.xaml.cs">
-      <DependentUpon>RatingBox.xaml</DependentUpon>
-    </Compile>
     <Compile Include="View\ViewOrEditRecipe.xaml.cs">
       <DependentUpon>ViewOrEditRecipe.xaml</DependentUpon>
     </Compile>

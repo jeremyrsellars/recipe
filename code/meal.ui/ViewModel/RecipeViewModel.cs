@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Sellars.Windows.Input;
 using Sellars.Service;
 using Sellars.Meal.Svc.Service;
+using Sellars.Collections.Generic;
 using Doc=System.Windows.Documents;
 using Sellars.Meal.Svc.Model;
 
@@ -18,7 +19,7 @@ namespace Sellars.Meal.UI.ViewModel
    {
       public RecipeViewModel ()
       {
-         SaveCommand = new RelayCommand (Save_Execute);
+         SaveCommand = new RelayCommand (Save_Execute, Save_Enabled);
          EditMode = true;
       }
 
@@ -53,14 +54,20 @@ namespace Sellars.Meal.UI.ViewModel
             if (m_recipe == value)
                return;
             m_recipe = value;
+            m_isRatingDirty = false;
             if (value == null)
             {
-               m_recipeParts.CollectionChanged -= m_recipeParts_CollectionChanged;
+               if (m_recipeParts != null)
+                  m_recipeParts.CollectionChanged -= m_recipeParts_CollectionChanged;
                m_recipeParts = null;
+               if (m_tags != null)
+                  m_tags.CollectionChanged -= m_tags_CollectionChanged;
+               m_tags = null;
                m_userRating = null;
             }
             else
             {
+               // Recipe parts
                var existingParts = 
                   value
                      .Parts
@@ -81,6 +88,26 @@ namespace Sellars.Meal.UI.ViewModel
                            };
                   };
                m_recipeParts.CollectionChanged += m_recipeParts_CollectionChanged;
+
+               // Tags
+               var existingTags = 
+                  value
+                     .Tags
+                     .Select (p => new TagViewModel{Model=(Tag)p})
+                     .ToList ();
+               m_tags = new AutoAddCollection<ViewModel.TagViewModel> (existingTags);
+               m_tags.CreateNewItem = 
+                  delegate 
+                  {
+                     return 
+                        new Sellars.Meal.UI.ViewModel.TagViewModel
+                           {
+                              Model = new Tag {Name = ""},
+                           };
+                  };
+               m_tags.CollectionChanged += m_tags_CollectionChanged;
+
+               // Ratings
                double rating;
                rating = 
                   (value.Ratings == null || value.Ratings.Count == 0) ?
@@ -90,6 +117,18 @@ namespace Sellars.Meal.UI.ViewModel
                         (seed, r) => seed + r.Value) / value.Ratings.Count);
 
                m_userRating = new RatingViewModel (rating);
+               // Cause a rating to be added if the value property changes.
+               m_userRating.PropertyChanged += 
+                  (s, dea) =>
+                     {
+                        if (dea.PropertyName == "Value")
+                           m_isRatingDirty = true;
+                     };
+               for (int i = 0; i < m_ratingDescriptions.Length; i++)
+               {
+                  string description = m_ratingDescriptions[i];
+                  m_userRating.AddOption (i + 1, description);
+               }
             }
             OnPropertyChanged ("Recipe");
             OnPropertyChanged ("Document");
@@ -119,7 +158,7 @@ namespace Sellars.Meal.UI.ViewModel
             if (m_sourceVM == null)
             {
                m_sourceVM = 
-                  Sources.FirstOrDefault (s => StringComparer.CurrentCultureIgnoreCase.Equals (s.Name, Recipe.Source.Name));
+                  AllSources.FirstOrDefault (s => StringComparer.CurrentCultureIgnoreCase.Equals (s.Name, Recipe.Source.Name));
                if (m_sourceVM == null)
                   m_sourceVM = new SourceViewModel (Recipe.Source, true);
             }
@@ -137,6 +176,14 @@ namespace Sellars.Meal.UI.ViewModel
          }
       }
 
+      public AutoAddCollection<ViewModel.TagViewModel> Tags
+      {
+         get
+         {
+            return m_tags;
+         }
+      }
+
       void m_recipeParts_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
       {
          if (m_recipe == null)
@@ -145,7 +192,8 @@ namespace Sellars.Meal.UI.ViewModel
          var modelParts = m_recipe.Parts;
          modelParts.Clear ();
          modelParts.AddRange (
-            m_recipeParts.Take (m_recipeParts.Count - 1)
+            m_recipeParts
+               .Take (m_recipeParts.Count - 1)
                .Select (vm => vm.Model));
       }
       
@@ -158,35 +206,88 @@ namespace Sellars.Meal.UI.ViewModel
          }
       }
       
-      public IEnumerable<SourceViewModel>
-      Sources
+      void m_tags_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+      {
+         if (m_recipe == null)
+            return; // weird
+         
+         var modelTags = m_recipe.Tags;
+         modelTags.Clear ();
+         modelTags.AddRange (
+            m_tags
+               .Take (m_tags.Count - 1)
+               .Select (vm => vm.Model));
+         ResetRemainingTags ();
+      }
+      
+      public IEnumerable<string>
+      AllTags
       {
          get
          {
-            return m_sources ?? (m_sources = new ObservableCollection<SourceViewModel> (GetSourcesCore ()));
+            if (m_allTags == null)
+            {
+               var allTags = GetTagsCore ();
+               m_allTags = allTags as ObservableCollection<string> ?? new ObservableCollection<string> (allTags);
+            }
+            return m_allTags;
+         }
+      }
+      
+      public IEnumerable<string>
+      AllRemainingTags
+      {
+         get
+         {
+            if (m_usedTagNames == null)
+            {
+               m_usedTagNames = new ObservableCollection<string> ();
+               ResetRemainingTags ();
+            }
+            if (m_remainingTags == null)
+               m_remainingTags = new ExceptList<string> (AllTags, m_usedTagNames);
+            return m_remainingTags;
+         }
+      }
+      
+      private void ResetRemainingTags ()
+      {
+         m_usedTagNames.Clear ();
+         foreach (string tagName in m_tags.Select(t => t.Name).Where (name => !string.IsNullOrWhiteSpace (name)))
+         {
+            m_usedTagNames.Add (tagName);
+         }
+      }
+
+      public IEnumerable<SourceViewModel>
+      AllSources
+      {
+         get
+         {
+            return m_allSources ?? (m_allSources = new ObservableCollection<SourceViewModel> (GetSourcesCore ()));
          }
       }
       
       private SourceViewModel m_sourceUpdated;
       private void UpdateSources (SourceViewModel sourceUpdated)
       {
-         int index = m_sources.IndexOf (m_sourceUpdated);
+         int index = m_allSources.IndexOf (m_sourceUpdated);
          if (index >= 0)
          {
             if (sourceUpdated == null)
-               m_sources.RemoveAt (index);
+               m_allSources.RemoveAt (index);
             else
-               m_sources[index] = sourceUpdated;
+               m_allSources[index] = sourceUpdated;
          }
          else
          {
-            for (int i = 0; i < m_sources.Count; i++)
+            for (int i = 0; i < m_allSources.Count; i++)
             {
-               string name = m_sources[i].Name;
+               string name = m_allSources[i].Name;
                if (name == sourceUpdated.Name)
                   sourceUpdated = null;
                else if (name.CompareTo (sourceUpdated.Name) > 0)
-                  m_sources.Insert (i, sourceUpdated);
+                  m_allSources.Insert (i, sourceUpdated);
                else
                   continue;
                break;
@@ -198,8 +299,6 @@ namespace Sellars.Meal.UI.ViewModel
       private IEnumerable<SourceViewModel>
       GetSourcesCore ()
       {
-         var newSource = new Source ();
-         //yield return new SourceViewModel (newSource, false);
          var sources = 
             ServiceController.Get<Sellars.Meal.UI.Service.ISourceService> ().GetSources ()
                .OrderBy (s => s.Name);
@@ -207,6 +306,14 @@ namespace Sellars.Meal.UI.ViewModel
          {
             yield return new SourceViewModel (source, true);
          }
+      }
+
+      private IEnumerable<string>
+      GetTagsCore ()
+      {
+         var tags = 
+            ServiceController.Get<Sellars.Meal.UI.Service.ITagService> ().GetTags ();
+         return tags;
       }
 
       public RatingViewModel UserRating
@@ -217,14 +324,19 @@ namespace Sellars.Meal.UI.ViewModel
          }
       }
       
+      private bool Save_Enabled (object parameter)
+      {
+         return m_recipe != null && !string.IsNullOrWhiteSpace (m_recipe.Name);
+      }
+      
       private void Save_Execute (object parameter)
       {
-         if (m_userRating.IsDirty)
+         if (m_isRatingDirty)
          {
             Rating rating = new Rating ();
             rating.CreatedOn = DateTime.Now;
             rating.UserName = Sellars.Meal.UI.Service.UserService.CurrentUser.Name;
-            rating.Value = m_userRating.Rating;
+            rating.Value = m_userRating.Value;
             Recipe.Ratings.Add (rating);
          }
          if (string.IsNullOrWhiteSpace(FileName))
@@ -269,15 +381,33 @@ namespace Sellars.Meal.UI.ViewModel
          Doc.Section recipeHeader = new Doc.Section ();
          doc.Blocks.Add (recipeHeader);
 
+         int rating;
+
+         rating = 
+            (recipe.Ratings == null || recipe.Ratings.Count == 0)
+               ? 0
+               : (int)(recipe.Ratings.Aggregate (0.0, (sum, r) => sum + r.Value) / recipe.Ratings.Count);
+
+         string ratedString = new string('«', rating);
+         string notRatedString = new string('«', m_ratingDescriptions.Length - rating);
+
          Doc.Paragraph p;
-         recipeHeader.Blocks.Add (new Doc.Paragraph (new Doc.Underline (new Doc.Run(recipe.Name))));
+         recipeHeader.Blocks.Add (p = new Doc.Paragraph (new Doc.Underline (new Doc.Run(recipe.Name))));
          if (recipe.Source != null)
          {
-            recipeHeader.Blocks.Add (p = new Doc.Paragraph (new Doc.Italic (new Doc.Run("From "))));
-            p.Inlines.Add (new Doc.Run(recipe.Source.Name));
+            p.Inlines.Add (new Doc.Run(Environment.NewLine));
+            
+            if (!string.IsNullOrEmpty (ratedString))
+               p.Inlines.Add (new Doc.Run(ratedString){FontFamily = new System.Windows.Media.FontFamily ("Wingdings"), Foreground=System.Windows.Media.Brushes.Red});
+            if (!string.IsNullOrEmpty (notRatedString))
+               p.Inlines.Add (new Doc.Run(notRatedString){FontFamily = new System.Windows.Media.FontFamily ("Wingdings"), Foreground=System.Windows.Media.Brushes.Silver});
+            p.Inlines.Add (new Doc.Run(Environment.NewLine));
+            p.Inlines.Add (new Doc.Italic (new Doc.Run("From ")));
+            p.Inlines.Add (new Doc.Run(recipe.Source.Name + "\r\n"));
+
          }
 
-         if (recipe.Servings.ToDouble () > 0 || recipe.Servings.ToDouble () > 0)
+         if (recipe.Servings.ToDouble () > 0 || recipe.Yield.ToDouble () > 0)
          {
             string yieldAndOrServings = null;
             if (recipe.Servings.ToDouble () > 0)
@@ -287,8 +417,11 @@ namespace Sellars.Meal.UI.ViewModel
             if (recipe.Yield.ToDouble () > 0)
             {
                string yieldUnit = recipe.YieldUnit == null ? null : recipe.YieldUnit.Name;
+               string makes = "Makes " + recipe.Yield + " " + yieldUnit;
                if (yieldAndOrServings != null)
-                  yieldAndOrServings = yieldAndOrServings + " \u2022 " + "Yields " + recipe.Yield + " " + yieldUnit;
+                  yieldAndOrServings = yieldAndOrServings + " \u2022 " + makes;
+               else
+                  yieldAndOrServings = makes;
             }
             recipeHeader.Blocks.Add (new Doc.Paragraph (new Doc.Run(yieldAndOrServings)));
          }
@@ -410,12 +543,18 @@ namespace Sellars.Meal.UI.ViewModel
          return s.ToString ();
       }
 
-      private AutoAddCollection<RecipePartViewModel> m_recipeParts;
       private Sellars.Meal.UI.Model.Recipe  m_recipe;
+      private AutoAddCollection<RecipePartViewModel> m_recipeParts;
+      private AutoAddCollection<TagViewModel> m_tags;
       private RatingViewModel m_userRating;
       private SourceViewModel m_sourceVM;
       private bool m_editMode;
-      private static ObservableCollection<SourceViewModel> m_sources;
+      private bool m_isRatingDirty;
+      private static ObservableCollection<SourceViewModel> m_allSources;
+      private static ObservableCollection<string> m_allTags;
+      private static ExceptList<string> m_remainingTags;
+      private ObservableCollection<string> m_usedTagNames;
+      private static readonly string [] m_ratingDescriptions = {"Terrible","Bad", "OK", "Good", "Great"};
 
       public class SmartListFormatter
       {
@@ -464,42 +603,6 @@ namespace Sellars.Meal.UI.ViewModel
          private StringBuilder m_buf;
          private string m_delimiter;
          private string m_pairDelimiter;
-      }
-
-      public class RatingViewModel : NotifyPropertyChangedObject
-      {
-         public RatingViewModel (double rating)
-         {
-            m_rating = rating;
-         }
-
-         public bool IsDirty
-         {
-            get
-            {
-               return m_isDirty;
-            }
-            set
-            {
-               SetValue(ref m_isDirty, value, "IsDirty");
-            }
-         }
-
-         public double Rating
-         {
-            get
-            {
-               return m_rating;
-            }
-            set
-            {
-               IsDirty = true;
-               SetValue(ref m_rating, value, "Rating");
-            }
-         }
-
-         private double m_rating;
-         private bool m_isDirty;
       }
    }
 }

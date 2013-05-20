@@ -37,11 +37,34 @@ namespace Sellars.Meal.UI.Model
       
       public ModelId<IRecipe> Id{get;set;}
       public Fraction Servings{get;set;}
-      public Fraction Yield{get;set;}
-      public Unit YieldUnit{get;set;}
+      public Fraction Yield
+      {
+         get
+         {
+            return m_yield;
+         }
+         set
+         {
+            m_yield = value;
+         }
+      }
+      public Unit YieldUnit
+      {
+         get
+         {
+            return m_yieldUnit;
+         }
+         set
+         {
+            m_yieldUnit = value;
+         }
+      }
       public Source Source{get;set;}
       public DateTime CreatedOn{get;set;}
       public string CreatedBy{get;set;}
+
+      private Fraction m_yield;
+      private Unit m_yieldUnit;
 
       public List<RecipePart> Parts
       {

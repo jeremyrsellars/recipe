@@ -15,6 +15,7 @@ namespace Sellars.Meal.UI.ViewModel
       public SelectedIndexViewModel ()
       {
          m_observableSources = new ObservableCollection<Meal.Svc.Model.ISource> ();
+         m_observableTags = new ObservableCollection<string> ();
          NewRecipeCommand = new RelayCommand (NewRecipeExecute);
       }
 
@@ -64,12 +65,22 @@ namespace Sellars.Meal.UI.ViewModel
                }
                else
                   FilteredIndex = App.CreateFilteredIndex (Index, m_filter);
+               var recipes = 
+                  value.SelectMany (hdr => hdr.Recipes);
+
                Sources = 
-                  value.SelectMany (hdr => hdr.Recipes)
-                  .Select(rvm => rvm.Recipe.Source)
-                  .Where (source => source != null && !string.IsNullOrWhiteSpace (source.Name))
-                  .GroupBy (source => source.Name, (key, sources) => sources.FirstOrDefault ())
-                  .ToList ();
+                  recipes
+                     .Select(rvm => rvm.Recipe.Source)
+                     .Where (source => source != null && !string.IsNullOrWhiteSpace (source.Name))
+                     .GroupBy (source => source.Name, (key, sources) => sources.FirstOrDefault ())
+                     .ToList ();
+               TagNames =
+                  recipes
+                     .SelectMany(rvm => rvm.Recipe.Tags)
+                     .Select (t => t.Name)
+                     .GroupBy (t => t)
+                     .Select (g => g.Key)
+                     .ToList ();
             }
          }
       }
@@ -119,6 +130,28 @@ namespace Sellars.Meal.UI.ViewModel
          }
       }
 
+      public List<string>
+      TagNames
+      {
+         get
+         {
+            return m_tags ?? (m_tags = new List<string> ());
+         }
+         set
+         {
+            if (OnPropertyChanged("TagNames", ref m_tags, value))
+            {
+               m_observableTags.Clear ();
+               if (value == null)
+                  return;
+               foreach (string tag in value.OrderBy(s => s, StringComparer.InvariantCultureIgnoreCase))
+               {
+                  m_observableTags.Add (tag);
+               }
+            }
+         }
+      }
+
       public ICommand NewRecipeCommand{get;set;}
 
       internal ObservableCollection<Meal.Svc.Model.ISource> ObservableSources
@@ -129,12 +162,20 @@ namespace Sellars.Meal.UI.ViewModel
          }
       }
 
+      internal ObservableCollection<string> ObservableTags
+      {
+         get
+         {
+            return m_observableTags;
+         }
+      }
+
       private void NewRecipeExecute (object parameter)
       {
          var recipe = new Sellars.Meal.UI.Model.Recipe ();
          recipe.Source = new Sellars.Meal.UI.Model.Source ();
          recipe.Parts.Add (new Sellars.Meal.UI.Model.RecipePart ());
-         var rvm = new RecipeViewModel {Recipe=recipe};
+         var rvm = new RecipeViewModel {Recipe=recipe, EditMode=true};
          m_index
             .Where(rhvm => rhvm.Key == "New")
             .First ()
@@ -147,7 +188,9 @@ namespace Sellars.Meal.UI.ViewModel
       private List<RecipeHeaderViewModel> m_index;
       private List<RecipeHeaderViewModel> m_filteredIndex;
       private List<Model.Source> m_sources;
+      private List<string> m_tags;
       private ObservableCollection<Meal.Svc.Model.ISource> m_observableSources;
+      private ObservableCollection<string> m_observableTags;
       private RecipeViewModel m_recipe;
       private object m_selectedItem;
    }

@@ -1,0 +1,64 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewmodel="clr-namespace:Sellars.Meal.UI.ViewModel">
+   <DataTemplate DataType="{x:Type viewmodel:RatingViewModel}">
+      <DataTemplate.Resources>
+         <Style TargetType="ToggleButton" x:Key="TransparentButton">
+            <Setter Property="Template">
+               <Setter.Value>
+                  <ControlTemplate TargetType="ToggleButton">
+                     <Border Background="Transparent">
+                        <ContentPresenter/>
+                     </Border>
+                  </ControlTemplate>
+               </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+               <Trigger Property="ToggleButton.IsChecked" Value="True">
+                  <Setter Property="TextBlock.Foreground" Value="Red"/>
+               </Trigger>
+               <Trigger Property="ToggleButton.IsChecked" Value="False">
+                  <Setter Property="TextBlock.Foreground" Value="Silver"/>
+               </Trigger>
+            </Style.Triggers>
+         </Style>
+      </DataTemplate.Resources>
+      <ItemsControl ItemsSource="{Binding Options}">
+         <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+               <StackPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+         </ItemsControl.ItemsPanel>
+         <ItemsControl.ItemTemplate>
+            <DataTemplate>
+               <StackPanel>
+                  <ToggleButton x:Name="btnOption"
+                                Style="{StaticResource TransparentButton}"
+                                Command="{Binding Model.SelectCommand}" 
+                                IsChecked="{Binding IsSelected}" 
+                                CommandParameter="{Binding}"
+                                Background="Transparent" 
+                                BorderThickness="0"
+                                BorderBrush="Transparent">
+                     <!--<ToggleButton.Triggers>
+                        <Trigger Property="ToggleButton.IsPressed" Value="True">
+                           <Setter TargetName="btnOption" Property="TextElement.Foreground" Value="Red" />
+                        </Trigger>
+                     </ToggleButton.Triggers>-->
+                     <TextBlock ToolTip="{Binding Description}" 
+                                Text="«" FontFamily="Wingdings" FontSize="20"
+                                Padding="1" />
+                  </ToggleButton>
+                  <!--<Button Command="{Binding Model.SelectCommand}" 
+                          CommandParameter="{Binding}"
+                          Background="Transparent" 
+                          BorderThickness="0"
+                          BorderBrush="Transparent">
+                     <TextBlock ToolTip="{Binding Description}" Text="«" FontFamily="Wingdings" Padding="3" />
+                  </Button>-->
+               </StackPanel>
+            </DataTemplate>
+         </ItemsControl.ItemTemplate>
+      </ItemsControl>
+   </DataTemplate>
+</ResourceDictionary>

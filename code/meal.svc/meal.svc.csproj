@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Persistance\Source.cs" />
+    <Compile Include="Sellars\Collections\Generic\ExceptList.cs" />
     <Compile Include="Sellars\Collections\Generic\ReadonlyList.cs" />
     <Compile Include="Service\FileSystemService.cs" />
     <Compile Include="Service\IRecipeDataProvider.cs" />

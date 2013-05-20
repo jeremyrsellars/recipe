@@ -68,6 +68,21 @@ namespace Sellars.Meal.UI.ViewModel
          }
       }
       
+      public string Name
+      {
+         get
+         {
+            return m_model.Name;
+         }
+         set
+         {
+            if (m_model.Name == value)
+               return;
+            m_model.Name = value;
+            OnPropertyChanged ("Name");
+         }
+      }
+
       private bool m_visible;
       private Model.RecipePart m_model;
       private AutoAddCollection<Model.IngredientDetail>  m_ingredients;

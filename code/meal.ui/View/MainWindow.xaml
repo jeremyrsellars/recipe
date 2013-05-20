@@ -6,6 +6,7 @@
    xmlns:v="clr-namespace:Sellars.Meal.UI.View"
    xmlns:vm="clr-namespace:Sellars.Meal.UI.ViewModel"
    Title="Recipe" Width="1024" Height="768" 
+   Icon="/App.ico"
    >
    <!--WindowStyle="None"-->
    <Window.Resources>
@@ -125,14 +126,13 @@
 
             <HierarchicalDataTemplate 
                DataType="{x:Type vm:RecipeViewModel}">
-               <StackPanel>
-                  <TextBlock FontFamily="Bradley Hand ITC" FontSize="20" Text="{Binding Recipe.Name}" />
-                  <TextBlock FontFamily="Bradley Hand ITC" FontSize="20">
+               <StackPanel ToolTip="{Binding FileName}">
+                  <TextBlock FontFamily="Bradley Hand ITC" FontSize="20" Text="{Binding Recipe.Name}" TextAlignment="Center" />
+                  <TextBlock FontFamily="Bradley Hand ITC" FontSize="20" TextAlignment="Center">
                      <TextBlock.Text>
                         <Binding Path="Source.Name"  StringFormat="{}({0})" />
                      </TextBlock.Text>
                   </TextBlock>
-                  <!--<v:RatingBox Rating="{Binding UserRating.Value}" Glyph="å" />-->
                </StackPanel>
             </HierarchicalDataTemplate>
 

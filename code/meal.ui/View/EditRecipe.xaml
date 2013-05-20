@@ -85,7 +85,7 @@
                      <DockPanel Background="BurlyWood" Height="30" Width="250" HorizontalAlignment="Left" VerticalAlignment="Top" >
                         <TextBlock 
                            DockPanel.Dock="Top"
-                           Text="{Binding Model.Name}"  
+                           Text="{Binding Name}"  
                            FontFamily="Aharoni" FontSize="24" FontWeight="Bold" Foreground="Black" TextWrapping="Wrap" VerticalAlignment="Top" Height="30" HorizontalAlignment="Right"/>
                         <TextBlock 
                            DockPanel.Dock="Left"
@@ -111,7 +111,7 @@
                <TextBlock>
                   <TextBlock.Text>
                      <Binding 
-                          Path="Model.Name" 
+                          Path="Name" 
                           Converter="{StaticResource defaultConverter}">
                        <Binding.ConverterParameter>
                          <c:StringNullOrEmptyValueProvider DefaultValue="Add Part"/>
@@ -143,11 +143,12 @@
                  >
                 <TextBox
                     MinWidth="60"
+                    Padding="3 0 3 0"
                     BorderThickness="0"
                     Background="LightBlue">
                   <TextBox.Text>
                      <Binding 
-                          Path="Model.Name" 
+                          Path="Name" 
                           Converter="{StaticResource defaultConverter}">
                        <Binding.ConverterParameter>
                          <c:StringNullOrEmptyValueProvider DefaultValue="Recipe Part Name Goes Here"/>
@@ -248,6 +249,17 @@
                          </DataTemplate>
                        </GridViewColumn.CellTemplate>
                      </GridViewColumn>
+                     <GridViewColumn x:Name="colSequence" Header="" Width="200">
+                       <GridViewColumn.CellTemplate>
+                         <DataTemplate>
+                           <StackPanel Orientation="Horizontal">
+                              <Button Command="{Binding MoveUpCommand}">/\</Button>
+                              <Button Command="{Binding MoveDownCommand}">\/</Button>
+                              <Button Command="{Binding DeleteCommand}">X</Button>
+                           </StackPanel>
+                         </DataTemplate>
+                       </GridViewColumn.CellTemplate>
+                     </GridViewColumn>
                   </GridView>
                 </ListView.View>
               </ListView>
@@ -298,6 +310,7 @@
             >
             <TextBox
                MinWidth="60"
+               Padding="3 0 3 0"
                BorderThickness="0"
                Background="LightGray">
                <TextBox.Text>
@@ -344,7 +357,7 @@
                </Grid.RowDefinitions>
 
                <Label>Servings:</Label>
-               <Label Grid.Row="1">Yield:</Label>
+               <Label Grid.Row="1">Makes:</Label>
 
 
                <TextBox Grid.Column="1" Text="{Binding Recipe.Servings, Converter={StaticResource fractionConverter}}" Width="40" />
@@ -357,7 +370,7 @@
                   <Label>Source:</Label>
                   <ComboBox 
                      Width="120"
-                     ItemsSource="{Binding Sources}"
+                     ItemsSource="{Binding AllSources}"
                      DisplayMemberPath="Name"
                      Text="{Binding SourceName}"
                      IsEditable="True">
@@ -382,7 +395,33 @@
                   </ComboBox>
                </StackPanel>
 
-               <view:RatingBox Grid.Column="3" Grid.RowSpan="2" Rating="{Binding UserRating.Rating, Mode=TwoWay}" Width="120" Height="20" />
+               <!-- Tags -->
+               <StackPanel Orientation="Horizontal"
+                           Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="1" >
+                  <Label>Tags:</Label>
+                  <ItemsControl ItemsSource="{Binding Tags}">
+                     <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                           <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                     </ItemsControl.ItemsPanel>
+                     <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                           <ComboBox Text="{Binding Name, UpdateSourceTrigger=LostFocus}"
+                                     MinWidth="30"
+                                     IsEditable="True"
+                                     ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=ItemsControl}, Path=DataContext.AllRemainingTags}" />
+                        </DataTemplate>
+                     </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+               </StackPanel>
+
+               <!-- Rating -->
+               <ContentPresenter Grid.Column="3" Grid.RowSpan="2" Content="{Binding UserRating}">
+                  <ContentPresenter.Resources>
+                     <ResourceDictionary Source="Rating.xaml"/>
+                  </ContentPresenter.Resources>
+               </ContentPresenter>
 
                <ItemsControl Grid.Column="4" Grid.RowSpan="2"
                   DockPanel.Dock="Top"
@@ -398,11 +437,14 @@
                </ItemsControl>
             </Grid>
             <Button Height="21" DockPanel.Dock="Bottom" Command="{Binding SaveCommand}">Save</Button>
-            <ItemsControl 
-               DockPanel.Dock="Top"
-               ItemsSource="{Binding RecipeParts}"
-               ItemTemplate="{StaticResource RecipePartTemplate}">
-            </ItemsControl>
+            <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+               <ItemsControl 
+                  DockPanel.Dock="Top"
+                  ItemsSource="{Binding RecipeParts}"
+                  ItemTemplate="{StaticResource RecipePartTemplate}">
+               </ItemsControl>
+            </ScrollViewer>
          </DockPanel>
       </Border>
    </DockPanel>

@@ -49,7 +49,7 @@ namespace Sellars.Meal.UI
             recipe.Source = new Sellars.Meal.UI.Model.Source ();
             recipe.Parts.Add (new Sellars.Meal.UI.Model.RecipePart (){Name="Recipe"});
             vm = new SelectedIndexViewModel {Index = GetIndex ()};
-            var newRecipe = new RecipeViewModel{Recipe=recipe};
+            var newRecipe = new RecipeViewModel{Recipe=recipe, EditMode=true};
             var newHeader =
                new RecipeHeaderViewModel
                {
@@ -59,6 +59,7 @@ namespace Sellars.Meal.UI
             vm.Index.Insert (0, newHeader);
             vm.Recipe = newRecipe;
             ServiceController.Put<ISourceService> (new IndexSourceService (vm.ObservableSources));
+            ServiceController.Put<ITagService> (new IndexTagService (vm.ObservableTags));
             dataContext = vm;
          }
 
@@ -131,10 +132,14 @@ namespace Sellars.Meal.UI
       //   private RecipeIndexViewModel m_recipe;
       //}
 
-      internal static List<RecipeHeaderViewModel> CreateFilteredIndex(List<RecipeHeaderViewModel> Index, string filter)
+      internal static List<RecipeHeaderViewModel> CreateFilteredIndex(List<RecipeHeaderViewModel> index, string filter)
+      {
+         return CreateFilteredIndexByName (index, filter);
+      }
+      internal static List<RecipeHeaderViewModel> CreateFilteredIndexByName(List<RecipeHeaderViewModel> index, string filter)
       {
          return
-            Index
+            index
                .SelectMany (rivm => rivm.Recipes)
                .Where(rvm => rvm.Recipe != null && rvm.Recipe.Name != null && rvm.Recipe.Name.IndexOf (filter, StringComparison.CurrentCultureIgnoreCase) >= 0)
                .OrderBy (rvm => rvm.Recipe.Name)
@@ -153,6 +158,40 @@ namespace Sellars.Meal.UI
                      return list;
                   })
                .OrderBy (ivm => ivm.Key)
+               .ToList ();
+      }
+      private struct KeyRecipePair
+      {
+         public string Key;
+         public RecipeViewModel Recipe;
+      }
+      internal static List<RecipeHeaderViewModel> CreateFilteredIndexByTag(List<RecipeHeaderViewModel> index, string filter)
+      {
+         return
+            index
+               .SelectMany (rivm => rivm.Recipes)
+               .OrderBy (rvm => rvm.Recipe.Name)
+               .SelectMany (
+                  r =>
+                     (r.Recipe.Tags == null || r.Recipe.Tags.Count == 0)
+                        ? new KeyRecipePair[] {new KeyRecipePair{Key="Untagged", Recipe=r}}
+                        : r.Recipe.Tags.Select (t => new KeyRecipePair {Key = t.Name, Recipe = r}))
+               .GroupBy (
+                  pair => pair.Key, 
+                  StringComparer.InvariantCultureIgnoreCase)
+               .OrderBy (group => group.Key, StringComparer.InvariantCultureIgnoreCase)
+               .Select (
+                  group => 
+                  {
+                     string key = group.Key;
+                     RecipeHeaderViewModel ivm;
+                     ivm = new RecipeHeaderViewModel (){Key = key, Recipes = new List<RecipeViewModel> ()};
+                     ivm.Recipes = 
+                        group
+                           .Select (pair => pair.Recipe)
+                           .ToList ();
+                     return ivm;
+                  })
                .ToList ();
       }
 
