@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
+using Sellars.Meal.UI.Service;
 using Sellars.Meal.UI;
 using Sellars.Windows.Input;
 
@@ -17,6 +18,7 @@ namespace Sellars.Meal.UI.ViewModel
          m_observableSources = new ObservableCollection<Meal.Svc.Model.ISource> ();
          m_observableTags = new ObservableCollection<string> ();
          NewRecipeCommand = new RelayCommand (NewRecipeExecute);
+         PrintRecipeCommand = new RelayCommand (PrintRecipeExecute, PrintRecipeEnabled);
       }
 
       public string Filter
@@ -153,6 +155,18 @@ namespace Sellars.Meal.UI.ViewModel
       }
 
       public ICommand NewRecipeCommand{get;set;}
+      private ICommand m_printRecipeCommand;
+      public ICommand PrintRecipeCommand
+      {
+         get
+         {
+            return m_printRecipeCommand;
+         }
+         private set
+         {
+            m_printRecipeCommand = value;
+         }
+      }
 
       internal ObservableCollection<Meal.Svc.Model.ISource> ObservableSources
       {
@@ -182,6 +196,18 @@ namespace Sellars.Meal.UI.ViewModel
             .Recipes.Add (rvm);
          Index = new List<RecipeHeaderViewModel> (m_index);
          SelectedItem = rvm;
+      }
+
+      private  bool PrintRecipeEnabled (object parameter)
+      {
+         return parameter is RecipeViewModel;
+      }
+
+      private void PrintRecipeExecute (object parameter)
+      {
+         RecipeViewModel recipeVM = (RecipeViewModel)parameter;
+         var docPrintingService = Sellars.Service.ServiceController.Get<IDocumentPrintingService> ();
+         docPrintingService.PrintDocument (recipeVM.Document, recipeVM.FileName ?? recipeVM.Recipe.Name);
       }
 
       private string m_filter;

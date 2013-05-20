@@ -41,7 +41,7 @@ namespace Sellars.Meal.UI.ViewModel
             else if (m_model.Name == value)
                return;
             m_model.Name = value;
-            m_model.UserName=Sellars.Meal.UI.Service.UserService.CurrentUser.Name;
+            m_model.UserName=Sellars.Meal.UI.Service.Impl.UserService.CurrentUser.Name;
             m_model.CreatedOn=DateTime.Now;
             if (!string.IsNullOrWhiteSpace (value))
                Sellars.Service.ServiceController.Get<Sellars.Meal.UI.Service.ITagService> ().AddTag (value);
@@ -49,6 +49,19 @@ namespace Sellars.Meal.UI.ViewModel
          }
       }
 
+      public bool IsEditable
+      {
+         get
+         {
+            return m_isEditable;
+         }
+         set
+         {
+            SetValue (ref m_isEditable, value, "IsEditable");
+         }
+      }
+
       private Model.Tag m_model;
+      private bool m_isEditable;
    }
 }

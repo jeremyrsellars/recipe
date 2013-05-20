@@ -3,6 +3,8 @@
    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
    xmlns:sys="clr-namespace:System;assembly=mscorlib"
    xmlns:c="clr-namespace:Sellars.Meal.UI.Converters"
+   xmlns:controls="clr-namespace:Sellars.Meal.UI.Windows.Controls"
+   xmlns:vm="clr-namespace:Sellars.Meal.UI.ViewModel"
    BorderThickness="40">
    <UserControl.Resources>
       <!-- Converters -->
@@ -109,8 +111,31 @@
          Padding="5"
          >
          <DockPanel>
+            <DockPanel DockPanel.Dock="Top">
+               <!-- Rating -->
+               <ContentPresenter DockPanel.Dock="Right" Content="{Binding UserRating}">
+                  <ContentPresenter.Resources>
+                     <ResourceDictionary Source="Rating.xaml"/>
+                  </ContentPresenter.Resources>
+               </ContentPresenter>
+
+               <!-- Tags -->
+               <StackPanel Orientation="Horizontal">
+                  <Label>Tags:</Label>
+                  <ItemsControl ItemsSource="{Binding Tags}" ItemTemplateSelector="{DynamicResource TagTemplateSelector}">
+                     <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                           <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                     </ItemsControl.ItemsPanel>
+                  </ItemsControl>
+               </StackPanel>
+            </DockPanel>
             <!--<RichTextBox x:Name="rtxt"  Width="200"/>-->
             <!--<TextBox x:Name="txt"  Width="200"/>-->
+            <Button Command="{Binding DataContext.PrintRecipeCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                    CommandParameter="{Binding}"
+                    DockPanel.Dock="Bottom">Print</Button>
             <FlowDocumentReader Document="{Binding Document}" />
          </DockPanel>
       </Border>

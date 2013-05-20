@@ -63,6 +63,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Printing" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -94,16 +95,22 @@
     </ApplicationDefinition>
     <Compile Include="Converters\CookTimespanConverter.cs" />
     <Compile Include="Converters\NullToCollapsedVisibilityConverter.cs" />
+    <Compile Include="Model\FractionRange.cs" />
+    <Compile Include="Service\IDocumentPrintingService.cs" />
+    <Compile Include="Service\Impl\DocumentPrintingService.cs" />
     <Compile Include="Service\ITagService.cs" />
     <Compile Include="Service\IndexSourceService.cs" />
     <Compile Include="Service\IndexTagService.cs" />
     <Compile Include="Service\ISourceService.cs" />
+    <Compile Include="ViewModel\IngredientDetailViewModel.cs" />
     <Compile Include="ViewModel\RatingViewModel.cs" />
     <Compile Include="ViewModel\SelectedIndexViewModel.cs" />
     <Compile Include="ViewModel\SourceViewModel.cs" />
     <Compile Include="ViewModel\TagViewModel.cs" />
+    <Compile Include="Windows\Controls\BindingDataTemplateSelector.cs" />
     <Compile Include="Windows\Controls\ExtendedTreeView.cs" />
     <Compile Include="Windows\Controls\SelectedItemDataTemplateSelector.cs" />
+    <Compile Include="Windows\DataBinder.cs" />
     <None Include="app.config" />
     <None Include="MyRecipe.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -140,7 +147,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Service\UserService.cs" />
+    <Compile Include="Service\Impl\UserService.cs" />
     <Compile Include="ViewModel\RecipeHeaderViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="View\ViewOrEditRecipe.xaml.cs">
@@ -162,8 +169,8 @@
     <Compile Include="Converters\SourceConverter.cs" />
     <Compile Include="Converters\NamedItemConverter.cs" />
     <Compile Include="Converters\FractionConverter.cs" />
-    <Compile Include="Service\MockSourceService.cs" />
-    <Compile Include="Service\MockRecipeService.cs" />
+    <Compile Include="Service\Impl\MockSourceService.cs" />
+    <Compile Include="Service\Impl\MockRecipeService.cs" />
     <Compile Include="Model\NamedItem.cs" />
     <Compile Include="Model\NotifyPropertyChangedObject.cs" />
     <Compile Include="Model\Source.cs" />

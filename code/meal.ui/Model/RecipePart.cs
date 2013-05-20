@@ -54,7 +54,16 @@ namespace Sellars.Meal.UI.Model
          {
             if (Ingredients == null)
                return new ReadonlyList<IIngredientDetail> ();
-            return new ReadonlyList<IIngredientDetail> (Ingredients.Cast<IIngredientDetail>());
+            return new ReadonlyList<IIngredientDetail> (
+               Ingredients
+                  .Cast<IIngredientDetail>()
+                  .Where (
+                     id => 
+                        id.Amount != Fraction.Zero 
+                        || (id.Ingredient != null && !string.IsNullOrWhiteSpace(id.Ingredient.Name))
+                        || (id.Preparation != null && id.Preparation.Count != 0)
+                        || id.Quantity != Fraction.Zero
+                        || (id.Unit != null && !string.IsNullOrWhiteSpace (id.Unit.Name))));
          }
       }
 

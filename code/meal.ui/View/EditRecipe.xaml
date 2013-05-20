@@ -182,14 +182,14 @@
                 <Label>Prep Method</Label>
                 <TextBox Text="{Binding Model.PreparationMethod, Converter={StaticResource tagConverter}}" MinWidth="40"/>
                 <Label>Prep Time</Label>
-                <TextBox Text="{Binding Model.PreparationTime, Converter={StaticResource shortCookTimespanConverter}}" MinWidth="20"/>
+                <TextBox Text="{Binding Model.PreparationTime, Converter={StaticResource shortCookTimespanConverter}}" MinWidth="40"/>
                 <Label>Preheat</Label>
                 <TextBox Text="{Binding Model.Temperature, Converter={StaticResource temperatureConverter}}" MinWidth="20"/>
                 <Label>°F</Label>
                 <Label>Cook Time</Label>
-                <TextBox Text="{Binding Model.CookTime, Converter={StaticResource shortCookTimespanConverter}}" MinWidth="10"/>
+                <TextBox Text="{Binding Model.CookTime, Converter={StaticResource shortCookTimespanConverter}}" MinWidth="40"/>
                 <Label>Chill Time</Label>
-                <TextBox Text="{Binding Model.ChillTime, Converter={StaticResource shortCookTimespanConverter}}" MinWidth="10"/>
+                <TextBox Text="{Binding Model.ChillTime, Converter={StaticResource shortCookTimespanConverter}}" MinWidth="40"/>
               </StackPanel>
               <ListView
                  ItemsSource="{Binding Ingredients}"
@@ -215,7 +215,7 @@
                      <GridViewColumn x:Name="colAmount"  Header="Amount" Width="60">
                        <GridViewColumn.CellTemplate>
                          <DataTemplate>
-                           <TextBox Text="{Binding Amount, Converter={StaticResource fractionConverter}}"
+                           <TextBox Text="{Binding Amount.Text}"
                                     BorderThickness="0"
                                     Width="{Binding Width, ElementName=colAmount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                          </DataTemplate>
@@ -250,15 +250,41 @@
                        </GridViewColumn.CellTemplate>
                      </GridViewColumn>
                      <GridViewColumn x:Name="colSequence" Header="" Width="200">
-                       <GridViewColumn.CellTemplate>
-                         <DataTemplate>
-                           <StackPanel Orientation="Horizontal">
-                              <Button Command="{Binding MoveUpCommand}">/\</Button>
-                              <Button Command="{Binding MoveDownCommand}">\/</Button>
-                              <Button Command="{Binding DeleteCommand}">X</Button>
-                           </StackPanel>
-                         </DataTemplate>
-                       </GridViewColumn.CellTemplate>
+                              <GridViewColumn.CellTemplate>
+                                 <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                       <StackPanel.Resources>
+                                          <Style TargetType="{x:Type Button}">
+                                             <Style.Triggers>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                   <Trigger.Setters>
+                                                      <Setter Property="Visibility" Value="Hidden"/>
+                                                   </Trigger.Setters>
+                                                </Trigger>
+                                             </Style.Triggers>
+                                             <Setter Property="Background" Value="Transparent"/>
+                                             <Setter Property="BorderBrush" Value="Transparent"/>
+                                             <Setter Property="BorderThickness" Value="0"/>
+                                             <Setter Property="Padding" Value="-4"/>
+                                          </Style>
+                                          <Style TargetType="{x:Type TextBlock}">
+                                             <Setter Property="TextElement.FontFamily" Value="Wingdings 3"/>
+                                             <Setter Property="Margin" Value="2"/>
+                                          </Style>
+                                       </StackPanel.Resources>
+                                       <Button Command="{Binding MoveUpCommand}" CommandParameter="{Binding}">
+                                          <TextBlock Text="p"/>
+                                       </Button>
+                                       <Button Command="{Binding MoveDownCommand}" CommandParameter="{Binding}">
+                                          <TextBlock Text="q" />
+                                       </Button>
+                                       <Button Command="{Binding DeleteCommand}" CommandParameter="{Binding}">
+                                          <TextBlock Text="r" TextElement.FontFamily="Webdings" />
+                                       </Button>
+                                       <!--<TextBlock Text="{Binding Index}" />-->
+                                    </StackPanel>
+                                 </DataTemplate>
+                              </GridViewColumn.CellTemplate>
                      </GridViewColumn>
                   </GridView>
                 </ListView.View>
@@ -352,8 +378,8 @@
                   <ColumnDefinition />
                </Grid.ColumnDefinitions>
                <Grid.RowDefinitions>
-                  <RowDefinition Height="22" />
-                  <RowDefinition Height="22" />
+                  <RowDefinition Height="24" />
+                  <RowDefinition Height="24" />
                </Grid.RowDefinitions>
 
                <Label>Servings:</Label>
@@ -397,32 +423,27 @@
 
                <!-- Tags -->
                <StackPanel Orientation="Horizontal"
-                           Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="1" >
+                           Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="1">
                   <Label>Tags:</Label>
-                  <ItemsControl ItemsSource="{Binding Tags}">
+                  <ItemsControl ItemsSource="{Binding Tags}" ItemTemplateSelector="{DynamicResource TagTemplateSelector}">
                      <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                            <StackPanel Orientation="Horizontal" />
                         </ItemsPanelTemplate>
                      </ItemsControl.ItemsPanel>
-                     <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                           <ComboBox Text="{Binding Name, UpdateSourceTrigger=LostFocus}"
-                                     MinWidth="30"
-                                     IsEditable="True"
-                                     ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=ItemsControl}, Path=DataContext.AllRemainingTags}" />
-                        </DataTemplate>
-                     </ItemsControl.ItemTemplate>
                   </ItemsControl>
                </StackPanel>
 
                <!-- Rating -->
-               <ContentPresenter Grid.Column="3" Grid.RowSpan="2" Content="{Binding UserRating}">
-                  <ContentPresenter.Resources>
-                     <ResourceDictionary Source="Rating.xaml"/>
-                  </ContentPresenter.Resources>
-               </ContentPresenter>
-
+               <StackPanel Grid.Column="3" >
+                  <ContentPresenter Content="{Binding UserRating}" 
+                                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                     <ContentPresenter.Resources>
+                        <ResourceDictionary Source="Rating.xaml"/>
+                     </ContentPresenter.Resources>
+                  </ContentPresenter>
+               </StackPanel>
+               
                <ItemsControl Grid.Column="4" Grid.RowSpan="2"
                   DockPanel.Dock="Top"
                   ItemsSource="{Binding RecipeParts}"

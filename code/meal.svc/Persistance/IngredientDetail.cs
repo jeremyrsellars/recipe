@@ -20,6 +20,7 @@ namespace Sellars.Meal.Svc.Persistance
             Ingredient = ingredientDetail.Ingredient == null ? "" : ingredientDetail.Ingredient.Name,
             Quantity = ingredientDetail.Quantity.ToString (),
             Amount = ingredientDetail.Amount.ToString (),
+            AmountMax = ingredientDetail.AmountMax.ToString (),
             Unit = ingredientDetail.Unit == null ? "" : ingredientDetail.Unit.Name,
          };
          if (ingredientDetail.Preparation == null)
@@ -33,6 +34,7 @@ namespace Sellars.Meal.Svc.Persistance
       public string Preparation;  // {get;set;}
       public string Quantity;  // {get;set;}
       public string Amount;  // {get;set;}
+      public string AmountMax;  // {get;set;}
       public string Unit;  // {get;set;}
 
       #region IIngredientDetail Members
@@ -68,6 +70,16 @@ namespace Sellars.Meal.Svc.Persistance
          {
             Fraction f;
             Fraction.TryParse (Amount, out f);
+            return f;
+         }
+      }
+
+      Fraction IIngredientDetail.AmountMax
+      {
+         get
+         {
+            Fraction f;
+            Fraction.TryParse (AmountMax, out f);
             return f;
          }
       }

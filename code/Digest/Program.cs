@@ -14,7 +14,7 @@ namespace Digest
    {
       static void Main(string[] args)
       {
-         var input = new Input (Environment.GetFolderPath (Environment.SpecialFolder.MyDocuments));
+         var input = new Input (@"c:\code\jeremy.sellars\food\fromOdp");//(Environment.GetFolderPath (Environment.SpecialFolder.MyDocuments));
          //PrintDict (input.Ethnicity);
          //PrintDict (input.MealType);
          //PrintDict (input.Source);
@@ -46,7 +46,7 @@ namespace Digest
             Unit = CsvDictionary.FromFile (Path.Combine ( basePath, "Unit.csv"));
 
             Ingredient = CsvDictionary.ListFromFile (Path.Combine ( basePath, "Ingredient.csv"));
-            MealComment = CsvDictionary.ListFromFile (Path.Combine ( basePath, "MealComponent.csv"));
+            MealComment = CsvDictionary.ListFromFile (Path.Combine ( basePath, "MealComment.csv"));
             Meal = CsvDictionary.ListFromFile (Path.Combine ( basePath, "Meal.csv"));
          }
 
@@ -87,16 +87,30 @@ namespace Digest
             }
 
             Recipe recipe = new Recipe ();
+            string mealType = meal["Type"];
             recipe.CreatedBy = user;
             recipe.CreatedOn = dt;
-            recipe.FileName = meal[MealColumn.Name].Replace ("\"", "") + ".recipe";
+            recipe.FileName = meal[MealColumn.Name].Replace ("\"", "").Replace("\\", "").Replace("/", "") + ".recipe";
             recipe.Name = meal[MealColumn.Name];
             int rating;
             if (!string.IsNullOrEmpty (meal[MealColumn.Rating]) && int.TryParse (meal[MealColumn.Rating], out rating))
                recipe.Ratings = new [] {new Rating {CreatedOn = createdOn, UserName=user, Value=rating}};
             recipe.Servings = meal[MealColumn.Servings];
+            recipe.Yield = meal[MealColumn.Yield];
+            recipe.YieldUnit = meal[MealColumn.YieldUnitId];
             recipe.Source = new Source {Name = meal[MealColumn.Source], CreatedOn=createdOn};
-            recipe.Tags = new [] {new Tag {Name = "recipes.odb", CreatedOn=createdOn, UserName=user}};
+            
+            if (!string.IsNullOrWhiteSpace (mealType))
+            {
+               recipe.Tags = new []
+                  {
+                     new Tag {Name = mealType, CreatedOn=createdOn, UserName=user},
+                  };
+            }
+            else
+            {
+               recipe.Tags = new Tag[0];
+            };
             
             RecipePart part = new RecipePart ();
             recipe.Parts = new [] {part};
@@ -110,7 +124,7 @@ namespace Digest
             part.CookSeconds = ParseTimeOfDayAsSeconds (meal[MealColumn.CookTime]);
             //part.ChillSeconds = ParseTimeOfDayAsSeconds (meal[MealColumn.ChillTime]);
             //part.Ingredients
-            part.Instructions = new [] {meal[MealColumn.Instructions]};
+            part.Instructions = new [] {FormatInstructions (meal[MealColumn.Instructions])};
             part.Name = meal[MealColumn.Name];
             //recipe. = meal[MealColumn.Description];
             part.PreparationSeconds = ParseTimeOfDayAsSeconds (meal[MealColumn.PreparationTime]);
@@ -147,6 +161,12 @@ namespace Digest
 
             yield return recipe;
          }
+      }
+
+      private static System.Text.RegularExpressions.Regex m_regex = new System.Text.RegularExpressions.Regex (@"(\r\n)+");
+      private static string FormatInstructions (string instructions)
+      {
+         return m_regex.Replace (instructions, "\r\n");
       }
 
       private static int ParseTimeOfDayAsSeconds (string value)

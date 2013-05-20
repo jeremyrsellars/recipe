@@ -11,6 +11,7 @@ using Sellars.Service;
 using Sellars.Meal.Svc.Service;
 using Sellars.Data.Model;
 using Sellars.Meal.UI.Service;
+using Sellars.Meal.UI.Service.Impl;
 using Sellars.Meal.UI.ViewModel;
 
 namespace Sellars.Meal.UI
@@ -60,6 +61,7 @@ namespace Sellars.Meal.UI
             vm.Recipe = newRecipe;
             ServiceController.Put<ISourceService> (new IndexSourceService (vm.ObservableSources));
             ServiceController.Put<ITagService> (new IndexTagService (vm.ObservableTags));
+            ServiceController.Put<IDocumentPrintingService> (new DocumentPrintingService ());
             dataContext = vm;
          }
 

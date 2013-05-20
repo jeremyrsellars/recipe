@@ -28,7 +28,7 @@ namespace Sellars.Meal.UI.Converters
 
          if (value is string)
          {
-            var provider = new Service.MockSourceDataProvider ();
+            var provider = new Service.Impl.MockSourceDataProvider ();
             
             string name = (string) value;
             

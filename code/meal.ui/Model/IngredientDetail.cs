@@ -20,6 +20,7 @@ namespace Sellars.Meal.UI.Model
             Ingredient = ingredientDetail.Ingredient.Name,
             Quantity = ingredientDetail.Quantity,
             Amount = ingredientDetail.Amount,
+            AmountMax = ingredientDetail.AmountMax,
             Unit = Unit.FromUnit (ingredientDetail.Unit),
             Preparation = GetPreparationString (ingredientDetail.Preparation)
          };
@@ -95,7 +96,7 @@ namespace Sellars.Meal.UI.Model
          }
       }
 
-      public Fraction Amount 
+      public Fraction Amount
       {
          get
          {
@@ -104,6 +105,18 @@ namespace Sellars.Meal.UI.Model
          set
          {
             SetValue (ref m_amount, value, "Amount");
+         }
+      }
+
+      public Fraction AmountMax
+      {
+         get
+         {
+            return m_amountMax;
+         }
+         set
+         {
+            SetValue (ref m_amountMax, value, "AmountMax");
          }
       }
 
@@ -147,6 +160,11 @@ namespace Sellars.Meal.UI.Model
          get { return Amount; }
       }
 
+      Fraction IIngredientDetail.AmountMax
+      {
+         get { return AmountMax; }
+      }
+
       IUnit IIngredientDetail.Unit
       {
          get { return Unit; }
@@ -157,6 +175,7 @@ namespace Sellars.Meal.UI.Model
       private string m_preparation;
       private Fraction m_quantity;
       private Fraction m_amount;
+      private Fraction m_amountMax;
       private Unit m_unit;
    }
 }

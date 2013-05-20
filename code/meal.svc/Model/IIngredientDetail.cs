@@ -14,6 +14,7 @@ namespace Sellars.Meal.Svc.Model
       IReadonlyList<string> Preparation{get;}
       Fraction Quantity{get;}
       Fraction Amount {get;}
+      Fraction AmountMax {get;}
       IUnit Unit{get;}
    }
 }

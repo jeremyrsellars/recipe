@@ -76,6 +76,7 @@ namespace Sellars.Meal.UI.ViewModel
       {
          if (m_useNewItem && m_items.Count == index)
             ResetNewItem ();
+         var changedItem = m_items[index];
          m_items.RemoveAt (index);
       }
 
@@ -142,7 +143,7 @@ namespace Sellars.Meal.UI.ViewModel
       public bool Remove(T item)
       {
          int index = IndexOf (item);
-         if (index < 1)
+         if (index < 0)
             return false;
          RemoveAt (index);
          return true;
@@ -317,6 +318,8 @@ namespace Sellars.Meal.UI.ViewModel
                Subscribe (m_newItem);
             if (oldValue == null)
                OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, value, m_items.Count));
+            else if (m_newItem == null)
+               OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, oldValue));
             else
                OnCollectionChanged (new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Replace, value, oldValue));
          }

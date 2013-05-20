@@ -23,6 +23,12 @@
             </Style.Triggers>
          </Style>
       </DataTemplate.Resources>
+      <Grid>
+         <Border CornerRadius="5"
+                 BorderBrush="Blue"
+                 BorderThickness="2"
+                 Background="AliceBlue"/>
+
       <ItemsControl ItemsSource="{Binding Options}">
          <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
@@ -60,5 +66,56 @@
             </DataTemplate>
          </ItemsControl.ItemTemplate>
       </ItemsControl>
+      </Grid>
+   </DataTemplate>
+
+   <DataTemplate DataType="{x:Type viewmodel:RatingViewModel}" x:Key="ReadonlyRatingView">
+      <DataTemplate.Resources>
+         <Style TargetType="Label" x:Key="TransparentButton">
+            <Setter Property="Template">
+               <Setter.Value>
+                  <ControlTemplate TargetType="Label">
+                     <Border Background="Transparent">
+                        <ContentPresenter/>
+                     </Border>
+                  </ControlTemplate>
+               </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+               <Trigger Property="Label.IsEnabled" Value="True">
+                  <Setter Property="Label.Foreground" Value="Red"/>
+               </Trigger>
+               <Trigger Property="Label.IsEnabled" Value="False">
+                  <Setter Property="Label.Foreground" Value="Silver"/>
+               </Trigger>
+            </Style.Triggers>
+         </Style>
+      </DataTemplate.Resources>
+      <Grid>
+         <!--<Border CornerRadius="5"
+                 BorderBrush="Gray"
+                 BorderThickness="2"/>-->
+
+         <ItemsControl ItemsSource="{Binding Options}">
+            <ItemsControl.ItemsPanel>
+               <ItemsPanelTemplate>
+                  <StackPanel Orientation="Horizontal" Margin="2" />
+               </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+               <DataTemplate>
+                  <Label x:Name="btnOption"
+                         Style="{StaticResource TransparentButton}"
+                         IsEnabled="{Binding IsSelected}" 
+                         Background="Transparent" 
+                         BorderThickness="0"
+                         BorderBrush="Transparent"
+                         ToolTip="{Binding Description}" 
+                         Content="«" FontFamily="Wingdings" FontSize="20"
+                         Padding="2" />
+               </DataTemplate>
+            </ItemsControl.ItemTemplate>
+         </ItemsControl>
+      </Grid>
    </DataTemplate>
 </ResourceDictionary>
