@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="Sellars.Meal.UI.View.ViewOrEditRecipe"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:Sellars.Meal.UI.Converters"
+             xmlns:v="clr-namespace:Sellars.Meal.UI.View"
+             xmlns:vm="clr-namespace:Sellars.Meal.UI.ViewModel">
+   <UserControl.Resources>
+      <c:BooleanToCollapsedVisibilityConverter x:Key="boolToVis" />
+      <c:BooleanToCollapsedVisibilityConverter x:Key="boolToCollapsed" Inverted="true" />
+   </UserControl.Resources>
+      <DockPanel>
+      <CheckBox DockPanel.Dock="Bottom"
+                Margin="30 0 0 0"
+                IsChecked="{Binding EditMode}">
+         Edit
+      </CheckBox>
+      <v:EditRecipe Visibility="{Binding EditMode, Converter={StaticResource boolToVis}}"/>
+      <v:ViewRecipe Visibility="{Binding EditMode, Converter={StaticResource boolToCollapsed}}"/>
+   </DockPanel>
+</UserControl>

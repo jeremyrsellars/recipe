@@ -1,0 +1,40 @@
+recipe
+	recipePart []
+	comments []
+	ratings []
+	tags []
+	createdOn
+
+recipePart
+	preparationMethod		- Oven, slow cooker, skillet, freezer, etc.
+	preparationTime
+	cookTime
+	component []
+	instructions
+	comments
+
+ingredientDetail
+	ingredient      public       public   cream of chicken soup      public chicken breast, boneless, skinless
+	preparation      public       public       public       public       public       public     cooked, cubed
+	multiplier      public       public   2      public       public       public       public   2
+	amountNumerator      public    43      public       public       public       public  4
+	amountDenomination      public 4      public       public       public       public   1
+	amountUnit      public       public   oz      public       public       public       public  oz
+
+comment
+	user
+	comment
+	createdOn
+
+rating
+	user
+	rating
+	createdOn
+
+tag
+	user
+	name
+	createdOn
+
+
+auto words/snippets

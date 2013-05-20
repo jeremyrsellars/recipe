@@ -1,0 +1,12 @@
+﻿<UserControl x:Class="Sellars.Meal.UI.View.RatingBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="20" d:DesignWidth="100">
+   <Grid ToolTip="{Binding Rating}" MouseLeave="OnMouseLeave">
+      <TextBlock Name="txtMaxRating" FontFamily="Webdings" FontSize="20" Foreground="Silver" MouseDown="OnMouseDown" MouseMove="OnMouseMove" MouseUp="OnMouseUp"/>
+      <TextBlock Name="txtRating" FontFamily="Webdings" FontSize="20" Foreground="#CC1111" MouseDown="OnMouseDown" MouseMove="OnMouseMove" MouseUp="OnMouseUp" />
+   </Grid>
+</UserControl>

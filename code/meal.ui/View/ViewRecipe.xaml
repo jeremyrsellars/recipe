@@ -1,0 +1,118 @@
+﻿<UserControl x:Class="Sellars.Meal.UI.View.ViewRecipe"
+   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+   xmlns:sys="clr-namespace:System;assembly=mscorlib"
+   xmlns:c="clr-namespace:Sellars.Meal.UI.Converters"
+   BorderThickness="40">
+   <UserControl.Resources>
+      <!-- Converters -->
+      <c:DefaultConverter x:Key="defaultConverter"/>
+      <c:FractionConverter x:Key="fractionConverter"/>
+      <c:NamedItemConverter x:Key="namedItemConverter"/>
+      <c:SourceConverter x:Key="sourceConverter"/>
+      <c:GridColumnWidthConverter x:Key="colWidthConverter"/>
+      <c:BooleanToCollapsedVisibilityConverter x:Key="boolToCollapsedVisibilityConverter"/>
+      <c:BooleanToCollapsedVisibilityConverter x:Key="invertedBoolToCollapsedVisibilityConverter" Inverted="true"/>
+      <c:CookTimespanConverter x:Key="shortCookTimespanConverter">
+         <c:CookTimespanConverter.DayFormat>
+            <sys:String>{0} day</sys:String>
+         </c:CookTimespanConverter.DayFormat>
+         <c:CookTimespanConverter.DaysFormat>
+            <sys:String>{0} days</sys:String>
+         </c:CookTimespanConverter.DaysFormat>
+         <c:CookTimespanConverter.HourFormat>
+            <sys:String>{0} hr</sys:String>
+         </c:CookTimespanConverter.HourFormat>
+         <c:CookTimespanConverter.HoursFormat>
+            <sys:String>{0} hrs</sys:String>
+         </c:CookTimespanConverter.HoursFormat>
+         <c:CookTimespanConverter.MinuteFormat>
+            <sys:String>{0} min</sys:String>
+         </c:CookTimespanConverter.MinuteFormat>
+         <c:CookTimespanConverter.MinutesFormat>
+            <sys:String>{0} min</sys:String>
+         </c:CookTimespanConverter.MinutesFormat>
+         <c:CookTimespanConverter.SecondFormat>
+            <sys:String>{0} sec</sys:String>
+         </c:CookTimespanConverter.SecondFormat>
+         <c:CookTimespanConverter.SecondsFormat>
+            <sys:String>{0} sec</sys:String>
+         </c:CookTimespanConverter.SecondsFormat>
+      </c:CookTimespanConverter>
+      <c:CookTimespanConverter x:Key="microCookTimespanConverter">
+         <c:CookTimespanConverter.DayFormat>
+            <sys:String>{0}d</sys:String>
+         </c:CookTimespanConverter.DayFormat>
+         <c:CookTimespanConverter.DaysFormat>
+            <sys:String>{0}d</sys:String>
+         </c:CookTimespanConverter.DaysFormat>
+         <c:CookTimespanConverter.HourFormat>
+            <sys:String>{0}h</sys:String>
+         </c:CookTimespanConverter.HourFormat>
+         <c:CookTimespanConverter.HoursFormat>
+            <sys:String>{0}h</sys:String>
+         </c:CookTimespanConverter.HoursFormat>
+         <c:CookTimespanConverter.MinuteFormat>
+            <sys:String>{0}s</sys:String>
+         </c:CookTimespanConverter.MinuteFormat>
+         <c:CookTimespanConverter.MinutesFormat>
+            <sys:String>{0}m</sys:String>
+         </c:CookTimespanConverter.MinutesFormat>
+         <c:CookTimespanConverter.SecondFormat>
+            <sys:String>{0}s</sys:String>
+         </c:CookTimespanConverter.SecondFormat>
+         <c:CookTimespanConverter.SecondsFormat>
+            <sys:String>{0}s</sys:String>
+         </c:CookTimespanConverter.SecondsFormat>
+      </c:CookTimespanConverter>
+      <c:CookTimespanConverter x:Key="longCookTimespanConverter"/>
+      <!--<Style x:Key="NoteCard">
+         <Setter Property="StackPanel.Border"
+      </Style>-->
+
+   </UserControl.Resources>
+   <DockPanel>
+      <DockPanel 
+         DockPanel.Dock="Top"
+         LastChildFill="True">
+         <Border
+            BorderThickness="1,1,1,0"
+            BorderBrush="Black"
+            Background="LightGray"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            CornerRadius="9,9,0,0"
+            Padding="5"
+            DockPanel.Dock="Left"
+            >
+            <TextBlock
+               MinWidth="60"
+               Background="LightGray"
+               Text ="{Binding Recipe.Name}" />
+         </Border>
+         <Border
+            DockPanel.Dock="Right"
+            BorderThickness="0,0,0,1"
+            BorderBrush="Black"
+            Background="Transparent"
+            CornerRadius="0,0,0,0"
+            Padding="5"
+            >
+         </Border>
+      </DockPanel>
+      <Border
+         DockPanel.Dock="Right"
+         BorderThickness="1,0,1,1"
+         BorderBrush="Black"
+         Background="Transparent"
+         CornerRadius="0,0,0,0"
+         Padding="5"
+         >
+         <DockPanel>
+            <!--<RichTextBox x:Name="rtxt"  Width="200"/>-->
+            <!--<TextBox x:Name="txt"  Width="200"/>-->
+            <FlowDocumentReader Document="{Binding Document}" />
+         </DockPanel>
+      </Border>
+   </DockPanel>
+</UserControl>

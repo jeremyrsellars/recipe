@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Recipe 
+    Name="Jeremy's Brownie Sensations" 
+    Servings="12" 
+    Source="{x:Null}" 
+    CreatedOn="0001-01-01" 
+    CreatedBy="{x:Null}" 
+    xmlns="clr-namespace:Sellars.Meal.Svc.Persistance;assembly=meal.svc" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib">
+    <Recipe.Parts>
+        <x:Array Type="RecipePart">
+            <RecipePart PreparationSeconds="900" CookSeconds="1800" Temperature="350">
+                <RecipePart.PreparationMethod>
+                    <Tag UserName="{x:Null}" Name="Oven" CreatedOn="0001-01-01" />
+                </RecipePart.PreparationMethod>
+                <RecipePart.Ingredients>
+                    <x:Array Type="IngredientDetail">
+                        <IngredientDetail Ingredient="Egg" Preparation="Unbroken|Uncracked|Uncooked" Quantity="4" Amount="0" Unit="" />
+                        <IngredientDetail Ingredient="Sugar, Granulated" Preparation="" Quantity="0" Amount="2" Unit="c" />
+                        <IngredientDetail Ingredient="Vanilla Extract" Preparation="" Quantity="0" Amount="2" Unit="tsp" />
+                        <IngredientDetail Ingredient="Oil, Vegetable" Preparation="" Quantity="0" Amount="1/2" Unit="c" />
+                        <IngredientDetail Ingredient="Cocoa Powder" Preparation="" Quantity="0" Amount="1/4" Unit="c" />
+                        <IngredientDetail Ingredient="Flour, All-purpose" Preparation="" Quantity="0" Amount="1 1/2" Unit="c" />
+                        <IngredientDetail Ingredient="Salt" Preparation="" Quantity="0" Amount="1/2" Unit="tsp" />
+                        <IngredientDetail Ingredient="Baking Powder" Preparation="" Quantity="0" Amount="1/2" Unit="tsp" />
+                    </x:Array>
+                </RecipePart.Ingredients>
+                <RecipePart.Instructions>
+                    <x:Array Type="s:String" xml:space="preserve"><s:String>1. In small bowl, mix Eggs, Sugar, Vanilla.
+2. In small bowl, mix oil and cocoa.
+3. Fold oil mixture into egg mixture.
+4. In medium bowl, mix remaining dry ingredients. (Be sure to break up soda pockets.)
+5. Fold wet mixture into dry mixture.
+(optionally mix in 1/2 c chocolate chips and/or 1/2 c coconut)
+6. Bake at 350 F for 30 minutes, or until toothpick comes out clean.
+Let cool slowly or top will fall.</s:String></x:Array>
+                </RecipePart.Instructions>
+                <RecipePart.Comments>
+                    <x:Null />
+                </RecipePart.Comments>
+            </RecipePart>
+            <RecipePart PreparationSeconds="900" CookSeconds="1800" Temperature="350">
+                <RecipePart.PreparationMethod>
+                    <Tag UserName="{x:Null}" Name="Oven" CreatedOn="0001-01-01" />
+                </RecipePart.PreparationMethod>
+                <RecipePart.Ingredients>
+                    <x:Array Type="IngredientDetail">
+                        <IngredientDetail Ingredient="Egg" Preparation="" Quantity="4" Amount="0" Unit="" />
+                        <IngredientDetail Ingredient="Sugar, Granulated" Preparation="" Quantity="0" Amount="2" Unit="c" />
+                        <IngredientDetail Ingredient="Vanilla Extract" Preparation="" Quantity="0" Amount="2" Unit="tsp" />
+                        <IngredientDetail Ingredient="Oil, Vegetable" Preparation="" Quantity="0" Amount="1/2" Unit="c" />
+                        <IngredientDetail Ingredient="Cocoa Powder" Preparation="" Quantity="0" Amount="1/4" Unit="c" />
+                        <IngredientDetail Ingredient="Flour, All-purpose" Preparation="" Quantity="0" Amount="1 1/2" Unit="c" />
+                        <IngredientDetail Ingredient="Salt" Preparation="" Quantity="0" Amount="1/2" Unit="tsp" />
+                        <IngredientDetail Ingredient="Baking Powder" Preparation="" Quantity="0" Amount="1/2" Unit="tsp" />
+                    </x:Array>
+                </RecipePart.Ingredients>
+                <RecipePart.Instructions>
+                    <x:Array Type="s:String" xml:space="preserve"><s:String>1. In small bowl, mix Eggs, Sugar, Vanilla.
+2. In small bowl, mix oil and cocoa.
+3. Fold oil mixture into egg mixture.
+4. In medium bowl, mix remaining dry ingredients. (Be sure to break up soda pockets.)
+5. Fold wet mixture into dry mixture.
+(optionally mix in 1/2 c chocolate chips and/or 1/2 c coconut)
+6. Bake at 350 F for 30 minutes, or until toothpick comes out clean.
+Let cool slowly or top will fall.</s:String></x:Array>
+                </RecipePart.Instructions>
+                <RecipePart.Comments>
+                    <x:Null />
+                </RecipePart.Comments>
+            </RecipePart>
+        </x:Array>
+    </Recipe.Parts>
+    <Recipe.Comments>
+        <x:Null />
+    </Recipe.Comments>
+    <Recipe.Ratings>
+        <x:Null />
+    </Recipe.Ratings>
+    <Recipe.Tags>
+        <x:Null />
+    </Recipe.Tags>
+</Recipe>
