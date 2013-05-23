@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.ComponentModel;
-using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -16,16 +14,13 @@ using Sellars.Meal.UI.ViewModel;
 
 namespace Sellars.Meal.UI
 {
-   /// <summary>
-   /// Interaction logic for App.xaml
-   /// </summary>
    public partial class App : Application
    {
       private void Application_Startup(object sender, StartupEventArgs e)
       {
          var window = new Sellars.Meal.UI.View.MainWindow ();
 
-         ServiceController.Put<IRecipeService> (new FileSystemRecipeService ());
+         ServiceController.Put<IRecipeService>(new FileSystemRecipeService(AppConfig.Instance.RecipePath));
          //ServiceController.Put<IRecipeService> (IndexRecipeService.CreateIndex ());
 
          object dataContext;
@@ -267,6 +262,21 @@ namespace Sellars.Meal.UI
             new StringBuilder (),
             (sb, kvp) => (sb.Length == 0 ? sb : sb.Append (delimiter)).Append (kvp.Key).Append (kvpDelimiter).Append (kvp.Value))
             .ToString ();
+      }
+   }
+
+   public class AppConfig
+   {
+      public static readonly AppConfig Instance = new AppConfig();
+
+      public string RecipePath
+      {
+         get
+         {
+            return
+               Environment.GetEnvironmentVariable("RECIPE_PATH") ??
+               Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Recipes");
+         }
       }
    }
 }

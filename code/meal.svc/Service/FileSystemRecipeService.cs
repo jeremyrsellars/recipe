@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Windows.Markup;
 using System.IO;
 using Sellars.Collections.Generic;
 using Sellars.Data.Model;
@@ -83,12 +80,9 @@ namespace Sellars.Meal.Svc.Service
          return Directory.GetFiles (path, "*.recipe", SearchOption.AllDirectories);
       }
 
-      public FileSystemRecipeService ()
+      public FileSystemRecipeService(string rootPath)
       {
-         string path = 
-            Environment.GetEnvironmentVariable("RECIPE_PATH") ??
-            Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.MyDocuments), "My Recipes");
-         RootPath = path;
+         RootPath = rootPath;
       }
 
       private IRecipe SaveRecipeCore (string filename, IRecipe recipe)

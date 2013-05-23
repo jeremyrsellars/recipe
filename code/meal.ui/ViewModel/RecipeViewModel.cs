@@ -510,7 +510,7 @@ namespace Sellars.Meal.UI.ViewModel
             x.DefaultExt = ".recipe";
             x.FileName = Recipe.Name;
             x.Filter = "Recipe file|*.recipe";
-            x.InitialDirectory = System.IO.Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.MyDocuments), "My Recipes");
+            x.InitialDirectory = AppConfig.Instance.RecipePath;
             x.OverwritePrompt = true;
             x.ValidateNames = true;
             if (!x.ShowDialog ().Value)
