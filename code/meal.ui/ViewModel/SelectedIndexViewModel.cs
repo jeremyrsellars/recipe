@@ -88,12 +88,14 @@ namespace Sellars.Meal.UI.ViewModel
                      .ToList ();
                var ingredients =
                   recipes
+                     .Where(rvm => !string.IsNullOrEmpty(rvm.FileName))
                      .SelectMany(rvm => rvm.Recipe.Parts)
                      .SelectMany(rpvm => rpvm.Ingredients)
                      .Select (id => ((IIngredientDetail)id).Ingredient);
                var recipeNameIngredients =
                   recipes
-                     .Select(rvm => new Model.Ingredient {Id = rvm.Recipe.Id, Name = rvm.Recipe.Name});
+                     .Where(rvm => !string.IsNullOrEmpty(rvm.FileName))
+                     .Select(rvm => new Model.Ingredient { Id = rvm.Recipe.Id, Name = rvm.Recipe.Name });
                Ingredients = 
                   recipeNameIngredients
                      .Union (ingredients)
